@@ -66,7 +66,7 @@ const Login = () => {
         // Store user ID if it's included in the response or decoded from the token
         // This is needed for the refresh token functionality
         const payload = JSON.parse(
-          atob(responseData.accessToken.split(".")[1])
+          atob(responseData.accessToken.split(".")[1]) // atob decodes the base64 string
         );
         if (payload.nameid) {
           localStorage.setItem("userId", payload.nameid);
@@ -80,7 +80,7 @@ const Login = () => {
       console.error("Error:", error);
       setError("An unexpected error occurred. Please try again later.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
