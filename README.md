@@ -137,6 +137,3 @@ This project is intended for learning purposes and may not follow all best pract
 - Gmail SMTP requires an "App Password" if you have 2FA enabled - never use your regular Gmail password
 - In a production environment, you would want to use more robust secret management
 
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
