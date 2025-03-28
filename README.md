@@ -65,16 +65,51 @@ The project consists of two main parts:
 - .NET 9.0 SDK
 - Node.js (v18+)
 - SQL Server (for the backend database)
+- A Gemini API key for the chatbot functionality
 
 ### Backend Setup
 
 1. Navigate to the JwtMinimalAPI directory
-2. Update the connection string in `appsettings.json` to point to your SQL Server instance
-3. Run the migrations to create the database:
+2. Create or update the following configuration files:
+
+   #### appsettings.json
+   Create this file with the following structure (replace with your own values):
+   ```json
+   {
+     "Logging": {
+       "LogLevel": {
+         "Default": "Information",
+         "Microsoft.AspNetCore": "Warning"
+       }
+     },
+     "ConnectionStrings": {
+       "UserDatabase": "Data Source=YOUR_SERVER;Database=YOUR_DATABASE;Integrated Security=True;Encrypt=True;Trust Server Certificate=True;"
+     },
+     "Appsettings": {
+       "Token": "YOUR_JWT_SECRET_KEY_GOES_HERE",
+       "Issuer": "YourApiJwt",
+       "Audience": "YourApiJwtClient"
+     },
+     "GmailOptions": {
+       "Host": "smtp.gmail.com",
+       "Port": 587,
+       "Email": "your-email@example.com",
+       "Password": "your-app-password"
+     }
+   }
+   ```
+
+3. Set up User Secrets for the ChatBot API key:
+   ```
+   dotnet user-secrets set "ChatBotApiKey" "YOUR_GEMINI_API_KEY"
+   ```
+
+4. Run the migrations to create the database:
    ```
    dotnet ef database update
    ```
-4. Start the API:
+
+5. Start the API:
    ```
    dotnet run
    ```
@@ -94,6 +129,13 @@ The project consists of two main parts:
 ## Notes
 
 This project is intended for learning purposes and may not follow all best practices for a production application. Security measures and error handling are still being developed.
+
+### Security Considerations
+
+- Never commit real API keys, database connection strings, JWT secrets, or email credentials to your repository
+- The project uses .NET User Secrets for development and should use environment variables or a secure configuration system in production
+- Gmail SMTP requires an "App Password" if you have 2FA enabled - never use your regular Gmail password
+- In a production environment, you would want to use more robust secret management
 
 ## License
 
