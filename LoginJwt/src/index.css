@@ -1,0 +1,209 @@
+/* Använd Roboto som standard typsnitt */
+html {
+  font-family: 'Roboto', sans-serif;
+  background-color: #1a1c1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6em;
+}
+
+body {
+  font-family: 'Roboto', sans-serif; /* För all text */
+}
+
+.form-box {
+  max-width: 300px;
+  background: #f1f7fe;
+  overflow: hidden;
+  border-radius: 16px;
+  color: #010101;
+}
+
+.form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 24px 24px;
+  gap: 16px;
+  text-align: center;
+}
+
+/*Form text - Använd Poppins för rubriker*/
+.title {
+  font-family: 'Poppins', sans-serif; /* Rubrikstil */
+  font-weight: bold;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  font-family: 'Roboto', sans-serif; /* Underrubriker */
+  font-size: 1rem;
+  color: #666;
+}
+
+/*Inputs box*/
+.form-container {
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #fff;
+  margin: 1rem 0 .5rem;
+  width: 100%;
+}
+
+.input {
+  background: none;
+  border: 0;
+  outline: 0;
+  height: 40px;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  font-size: .9rem;
+  padding: 8px 15px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.form-section {
+  padding: 16px;
+  font-size: .85rem;
+  background-color: #e0ecfb;
+  box-shadow: rgb(0 0 0 / 8%) 0 -1px;
+}
+
+.form-section a {
+  font-weight: bold;
+  color: #0066ff;
+  transition: color .3s ease;
+}
+
+.form-section a:hover {
+  color: #005ce6;
+  text-decoration: underline;
+}
+
+/*Button - Använd Poppins för knappar*/
+.form button {
+  background-color: #0066ff;
+  color: #fff;
+  border: 0;
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.form button:hover {
+  background-color: #005ce6;
+}
+
+/*Chatbot*/
+.chat-container {
+  width: 25em;
+  background-color: #f1f7fe;
+  border-radius: 1em;
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  background-color: #0066ff;
+  color: #ffffff;
+  padding: 0.625em;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+}
+
+.chat-header button {
+  position: fixed;
+  right: 30rem; 
+  border: none;
+  background: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+}
+
+.chat-header button:hover {
+  cursor: pointer;
+  color: #a32043;
+  transition: color 0.2s ease;
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 0.9375em;
+  height: 21.875em;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625em;
+}
+
+.message {
+  padding: 0.5em 0.75em;
+  border-radius: 0.5em;
+  max-width: 80%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.user {
+  align-self: flex-end;
+  background-color: #0066ff;
+  color: #ffffff;
+}
+
+.bot {
+  align-self: flex-start;
+  background-color: #e0ecfb;
+  color: #333333;
+}
+
+.chat-input-area {
+  display: flex;
+  padding: 0.625em;
+  background-color: #e0ecfb;
+  gap: 0.5em;
+}
+
+.chat-input-area input {
+  flex-grow: 1;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  border: 0.0625em solid #ccc;
+  outline: none;
+  font-family: 'Roboto', sans-serif;
+}
+
+.chat-input-area button {
+  padding: 0.5em 1em;
+  background-color: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.chat-input-area button:hover {
+  background-color: #005ce6;
+}
+
+.startBtn{
+  background-color: #0066ff;
+  color: #fff;
+  border: 0;
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .3s ease;
+  font-family: 'Poppins', sans-serif;
+}
