@@ -17,8 +17,8 @@ namespace JwtMinimalAPI.Services
     {
         public async Task<User?> RegisterAsync(UserDto request)
         {
-
-            if (await context.Users.AnyAsync(u => u.UserName == request.UserName))
+            // check if the user already exists and if the email is already in use
+            if (await context.Users.AnyAsync(u => u.UserName == request.UserName) && await context.Users.AnyAsync(e => e.Email == request.Email))
             {
                 return null;
             }

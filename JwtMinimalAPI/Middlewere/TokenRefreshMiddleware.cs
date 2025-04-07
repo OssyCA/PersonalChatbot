@@ -31,7 +31,6 @@ namespace JwtMinimalAPI.Middlewere
                 // Check if token is about to expire (within 5 minutes)
                 if (IsTokenNearExpiration(token))
                 {
-                    Console.WriteLine("Token is near expiration, attempting to refresh");
                     _logger.LogInformation("Token is near expiration, attempting to refresh");
 
                     // Get user ID from token claims
