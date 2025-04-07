@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../Utils/AuthUtils"; // Import the authFetch utility
+import TokenTestButton from "../Comp/TokenTestButton"; // Import the TokenTestButton component
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -127,7 +128,7 @@ const ChatBot = () => {
           Sign out
         </button>
       </div>
-
+      <TokenTestButton />
       <div className="chat-messages">
         {messages.length === 0 ? (
           <div className="empty-chat">
@@ -154,7 +155,6 @@ const ChatBot = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
-
       <div className="chat-input-area">
         <textarea
           placeholder="Type a message..."

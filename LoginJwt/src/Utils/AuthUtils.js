@@ -20,10 +20,9 @@ export const isTokenExpired = (token) => {
 // Refresh the access token using the refresh token
 export const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
-  const userId = localStorage.getItem("userId");
 
-  if (!refreshToken || !userId) {
-    // No refresh token or user ID available, user needs to log in again
+  if (!refreshToken) {
+    // No refresh token user needs to log in again
     return false;
   }
 

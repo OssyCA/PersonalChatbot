@@ -28,7 +28,7 @@ namespace JwtMinimalAPI.Middlewere
             {
                 var token = authHeader.ToString().Substring("Bearer ".Length).Trim();
 
-                // Check if token is about to expire (within 5 minutes)
+                // Check if token is about to expire 
                 if (IsTokenNearExpiration(token))
                 {
                     _logger.LogInformation("Token is near expiration, attempting to refresh");
@@ -39,12 +39,15 @@ namespace JwtMinimalAPI.Middlewere
                     // Get refresh token from custom header
                     if (context.Request.Headers.TryGetValue("X-Refresh-Token", out var refreshToken) && userId != Guid.Empty)
                     {
+                        _logger.LogInformation($"Refresh token found in headers. User ID: {userId}");
+
                         var refreshRequest = new RequestRefreshTokenDto
                         {
                             UserId = userId,
                             RefreshToken = refreshToken
                         };
 
+                        _logger.LogInformation("Calling RefreshTokensAsync...");
                         var tokenResponse = await authService.RefreshTokensAsync(refreshRequest);
 
                         if (tokenResponse != null)
@@ -53,11 +56,28 @@ namespace JwtMinimalAPI.Middlewere
                             context.Request.Headers["Authorization"] = $"Bearer {tokenResponse.AccessToken}";
 
                             // Add new tokens to response headers
+                            _logger.LogInformation("Tokens refreshed successfully");
                             context.Response.Headers.Append("X-Access-Token", tokenResponse.AccessToken);
                             context.Response.Headers.Append("X-Refresh-Token", tokenResponse.RefreshToken);
-                            Console.WriteLine("Fixes");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Token refresh failed - RefreshTokensAsync returned null");
                         }
                     }
+                    else
+                    {
+                        if (!context.Request.Headers.TryGetValue("X-Refresh-Token", out _))
+                        {
+                            _logger.LogWarning("X-Refresh-Token header not found in request");
+                        }
+
+                        if (userId == Guid.Empty)
+                        {
+                            _logger.LogWarning("User ID from token is empty or invalid");
+                        }
+                    }
+
                 }
             }
 
@@ -74,8 +94,8 @@ namespace JwtMinimalAPI.Middlewere
                 if (jwtToken == null)
                     return true;
 
-                // Check if token expires in less than 5 minutes
-                return jwtToken.ValidTo.ToUniversalTime() < DateTime.UtcNow.AddMinutes(5);
+                // Check if token expires in less than set time
+                return jwtToken.ValidTo.ToUniversalTime() < DateTime.UtcNow.AddMinutes(3);
             }
             catch
             {
@@ -94,7 +114,7 @@ namespace JwtMinimalAPI.Middlewere
                 if (jwtToken == null)
                     return Guid.Empty;
 
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
 
                 if (userIdClaim != null && Guid.TryParse(userIdClaim, out Guid userId))
                 {

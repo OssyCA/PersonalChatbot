@@ -110,15 +110,30 @@ body {
   overflow: hidden;
 }
 
+/* Improved chat header styling */
 .chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #0066ff;
   color: #ffffff;
-  padding: 0.625em;
+  padding: 0.8em 1.2em;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-family: 'Poppins', sans-serif;
   text-align: center;
   font-weight: bold;
+}
+
+.chat-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   font-family: 'Poppins', sans-serif;
 }
 
+/* Remove old button styles as they'll be replaced with new component */
 .chat-header button {
   position: fixed;
   right: 30rem; 
@@ -164,11 +179,38 @@ body {
   color: #333333;
 }
 
+/* Error message styling */
+.message.bot.error {
+  background-color: #ffeeee;
+  border-left: 3px solid #ff3b30;
+  color: #d32f2f;
+}
+
 .chat-input-area {
   display: flex;
   padding: 0.625em;
   background-color: #e0ecfb;
   gap: 0.5em;
+}
+
+/* Make textarea more responsive */
+.chat-input-area textarea {
+  flex-grow: 1;
+  padding: 0.8em;
+  border-radius: 1.5em;
+  border: 1px solid #e0e0e0;
+  outline: none;
+  resize: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95em;
+  transition: border-color 0.2s;
+  min-height: 24px;
+  max-height: 120px;
+}
+
+.chat-input-area textarea:focus {
+  border-color: #0066ff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
 }
 
 .chat-input-area input {
@@ -181,18 +223,26 @@ body {
 }
 
 .chat-input-area button {
-  padding: 0.5em 1em;
+  padding: 0.8em 1.5em;
   background-color: #0066ff;
   color: white;
   border: none;
-  border-radius: 0.5em;
+  border-radius: 1.5em;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   font-family: 'Poppins', sans-serif;
 }
 
 .chat-input-area button:hover {
   background-color: #005ce6;
+  transform: translateY(-2px);
+}
+
+.chat-input-area button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .startBtn{
@@ -206,4 +256,135 @@ body {
   cursor: pointer;
   transition: background-color .3s ease;
   font-family: 'Poppins', sans-serif;
+}
+
+/* Enhanced typing indicator */
+.typing-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #999;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Improved empty chat state */
+.empty-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  text-align: center;
+  padding: 2em;
+}
+
+.empty-chat p {
+  margin-top: 1em;
+  font-size: 1.1em;
+}
+
+/* Styles for token test button */
+.token-test-container {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Sign out button styles (for inline styling fallback) */
+.sign-out-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+}
+
+.sign-out-button:hover {
+  background-color: #e62e24;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.sign-out-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sign-out-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.sign-out-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error message in forms */
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  border-left: 3px solid #d32f2f;
 }
