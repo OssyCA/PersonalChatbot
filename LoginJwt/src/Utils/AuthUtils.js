@@ -1,4 +1,4 @@
-// Utility functions for handling authentication so it can be a js only file
+// Utility functions for handling authentication
 
 // Check if the access token is expired
 export const isTokenExpired = (token) => {
@@ -60,6 +60,7 @@ export const refreshAccessToken = async () => {
 // Create an authenticated fetch that handles token refresh
 export const authFetch = async (url, options = {}) => {
   let accessToken = localStorage.getItem("accessToken");
+  let refreshToken = localStorage.getItem("refreshToken");
 
   // Check if the token is expired
   if (isTokenExpired(accessToken)) {
@@ -74,19 +75,31 @@ export const authFetch = async (url, options = {}) => {
 
     // Get the new access token
     accessToken = localStorage.getItem("accessToken");
+    refreshToken = localStorage.getItem("refreshToken");
   }
 
-  // Add the authorization header
+  // Add the authorization header and refresh token header
   const authOptions = {
     ...options,
     headers: {
       ...options.headers,
       Authorization: `Bearer ${accessToken}`,
+      "X-Refresh-Token": refreshToken,
     },
   };
 
   // Make the request
-  const response = await fetch(url, authOptions);
+  let response = await fetch(url, authOptions);
+
+  // Check for new tokens in response headers
+  const newAccessToken = response.headers.get("X-Access-Token");
+  const newRefreshToken = response.headers.get("X-Refresh-Token");
+
+  // Update tokens if they were refreshed by the middleware
+  if (newAccessToken && newRefreshToken) {
+    localStorage.setItem("accessToken", newAccessToken);
+    localStorage.setItem("refreshToken", newRefreshToken);
+  }
 
   // Handle 401 Unauthorized
   if (response.status === 401) {
@@ -101,9 +114,11 @@ export const authFetch = async (url, options = {}) => {
 
     // Get the new access token
     accessToken = localStorage.getItem("accessToken");
+    refreshToken = localStorage.getItem("refreshToken");
 
     // Retry the request with the new token
     authOptions.headers.Authorization = `Bearer ${accessToken}`;
+    authOptions.headers["X-Refresh-Token"] = refreshToken;
     return fetch(url, authOptions);
   }
 
