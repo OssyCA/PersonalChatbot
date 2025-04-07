@@ -6,5 +6,6 @@ namespace JwtMinimalAPI.Data
     public class MiniJwtDbContext(DbContextOptions<MiniJwtDbContext> options):DbContext(options)
     {
         public DbSet<User> Users { get; set; }
+        //public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }

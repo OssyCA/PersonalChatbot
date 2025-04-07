@@ -43,6 +43,7 @@ namespace JwtMinimalAPI
                     policy.AllowAnyOrigin(); // Allow any origin
                     policy.AllowAnyMethod(); // Allow any method
                     policy.AllowAnyHeader(); // Allow any header
+                    policy.WithExposedHeaders("X-Access-Token", "X-Refresh-Token"); // Expose the headers to the client
 
                 });
             });
@@ -105,14 +106,13 @@ namespace JwtMinimalAPI
                 app.MapOpenApi();
                 app.MapScalarApiReference();
             }
-            app.UseAuthentication();
-            app.UseCors("AllowAllOrigins");
-            app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS
-
-           
-
-            app.UseExceptionHandling(); // Use the exception handling middleware
-            app.UseAuthorization();
+            app.UseExceptionHandling();        // 1. Exception handling should be first
+            app.UseHttpsRedirection();         // 2. HTTPS redirection early
+            app.UseCors("AllowAllOrigins");    // 3. CORS headers before authentication
+            app.UseAuthentication();           // 4. Authentication before refresh
+            app.UseTokenRefresh();             // 5. Token refresh after authentication
+            app.UseAuthorization();            // 6. Authorization after authentication
+            app.UseRateLimiter();
 
             #endregion
 

@@ -1,4 +1,4 @@
-﻿// JwtMinimalAPI/Middlewere/TokenRefreshMiddleware.cs
+﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Services;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,18 +8,20 @@ namespace JwtMinimalAPI.Middlewere
     public class TokenRefreshMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IAuthService _authService;
         private readonly ILogger<TokenRefreshMiddleware> _logger;
 
-        public TokenRefreshMiddleware(RequestDelegate next, IAuthService authService, ILogger<TokenRefreshMiddleware> logger)
+        public TokenRefreshMiddleware(RequestDelegate next, ILogger<TokenRefreshMiddleware> logger)
         {
             _next = next;
-            _authService = authService;
             _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
+
+            // Get service during request insted of at startup
+            var authService = context.RequestServices.GetRequiredService<IAuthService>();
+
             // Check if Authorization header is present
             if (context.Request.Headers.TryGetValue("Authorization", out StringValues authHeader) &&
                 authHeader.ToString().StartsWith("Bearer "))
@@ -29,39 +31,32 @@ namespace JwtMinimalAPI.Middlewere
                 // Check if token is about to expire (within 5 minutes)
                 if (IsTokenNearExpiration(token))
                 {
+                    Console.WriteLine("Token is near expiration, attempting to refresh");
                     _logger.LogInformation("Token is near expiration, attempting to refresh");
 
                     // Get user ID from token claims
                     var userId = GetUserIdFromToken(token);
 
-                    // Get refresh token from request cookies
-                    if (context.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) && userId != Guid.Empty)
+                    // Get refresh token from custom header
+                    if (context.Request.Headers.TryGetValue("X-Refresh-Token", out var refreshToken) && userId != Guid.Empty)
                     {
-                        var refreshRequest = new JwtMinimalAPI.DTO.RequestRefreshTokenDto
+                        var refreshRequest = new RequestRefreshTokenDto
                         {
                             UserId = userId,
                             RefreshToken = refreshToken
                         };
 
-                        var tokenResponse = await _authService.RefreshTokensAsync(refreshRequest);
+                        var tokenResponse = await authService.RefreshTokensAsync(refreshRequest);
 
                         if (tokenResponse != null)
                         {
                             // Set the new access token in the request header
                             context.Request.Headers["Authorization"] = $"Bearer {tokenResponse.AccessToken}";
 
-                            // Set new refresh token cookie
-                            context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
-                            {
-                                HttpOnly = true,
-                                Secure = true,
-                                SameSite = SameSiteMode.Strict,
-                                Expires = DateTime.UtcNow.AddDays(7)
-                            });
-
-                            // Also add them to response headers so frontend can update localStorage
+                            // Add new tokens to response headers
                             context.Response.Headers.Append("X-Access-Token", tokenResponse.AccessToken);
                             context.Response.Headers.Append("X-Refresh-Token", tokenResponse.RefreshToken);
+                            Console.WriteLine("Fixes");
                         }
                     }
                 }
@@ -116,7 +111,7 @@ namespace JwtMinimalAPI.Middlewere
         }
     }
 
-    // Extension method for easy registration in Program.cs
+    // Extension method for registration in Program.cs
     public static class TokenRefreshMiddlewareExtensions
     {
         public static IApplicationBuilder UseTokenRefresh(this IApplicationBuilder builder)

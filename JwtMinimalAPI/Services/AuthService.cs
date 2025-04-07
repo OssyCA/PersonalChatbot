@@ -84,7 +84,7 @@ namespace JwtMinimalAPI.Services
                 issuer: configuration.GetValue<string>("Appsettings:Issuer"),
                 audience: configuration.GetValue<string>("Appsettings:Audience"),
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // To reduce the window of attack if the token is stolen
+                expires: DateTime.UtcNow.AddMinutes(10), // To reduce the window of attack if the token is stolen
                 signingCredentials: creds
             );
 
@@ -143,7 +143,7 @@ namespace JwtMinimalAPI.Services
 
             // Invalidate the refresh token
             user.RefreshToken = null;
-            user.RefreshTokenExpireTime = DateTime.UtcNow.AddMinutes(2); // To invalidate the token
+            user.RefreshTokenExpireTime = DateTime.UtcNow.AddMinutes(1); // To invalidate the token
             await context.SaveChangesAsync();
 
             return true;
