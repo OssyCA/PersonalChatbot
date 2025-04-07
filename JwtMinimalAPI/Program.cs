@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -83,12 +84,15 @@ namespace JwtMinimalAPI
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true, // Enable auto-replenishment so that the rate limiter will automatically replenish the limit
-                        PermitLimit = 100, // Set the limit to 5 requests
+                        PermitLimit = 1, // Set the limit to 5 requests
                         QueueLimit = 0, // Set the queue limit to 0, get a 429(to many request) response when the limit is reached
-                        Window = TimeSpan.FromMinutes(1) // Set the window to 10 minutes
+                        Window = TimeSpan.FromMinutes(100) // Set the window to 10 minutes
                     }));
             });
 
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
 
             #endregion
 
@@ -104,6 +108,9 @@ namespace JwtMinimalAPI
             app.UseAuthentication();
             app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS
+
+           
+
             app.UseExceptionHandling(); // Use the exception handling middleware
             app.UseAuthorization();
 

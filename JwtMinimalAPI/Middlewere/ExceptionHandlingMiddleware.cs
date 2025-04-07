@@ -14,11 +14,11 @@ namespace JwtMinimalAPI.Middlewere
             _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context) // heart of the middleware
         {
             try
             {
-                await _next(context);
+                await _next(context); // if no exception occurs, continue to the next middleware, like authentication
             }
             catch (Exception ex)
             {
