@@ -18,7 +18,7 @@ const TokenTestButton = () => {
       }
 
       // Make a request using authFetch which handles token refresh
-      const response = await authFetch("https://localhost:7289/loginAuth", {
+      const response = await authFetch("https://localhost:7289/api/auth-test", {
         method: "GET",
       });
 

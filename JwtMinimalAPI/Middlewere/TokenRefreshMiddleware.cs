@@ -2,6 +2,7 @@
 using JwtMinimalAPI.Services;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace JwtMinimalAPI.Middlewere
 {
@@ -114,7 +115,7 @@ namespace JwtMinimalAPI.Middlewere
                 if (jwtToken == null)
                     return Guid.Empty;
 
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
                 if (userIdClaim != null && Guid.TryParse(userIdClaim, out Guid userId))
                 {

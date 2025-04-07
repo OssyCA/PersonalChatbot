@@ -2,6 +2,7 @@
 using JwtMinimalAPI.Helpers;
 using JwtMinimalAPI.Helpers.EmailConfig;
 using JwtMinimalAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JwtMinimalAPI.Endpoints
 {
@@ -79,6 +80,8 @@ namespace JwtMinimalAPI.Endpoints
                 }
                 return Results.Ok(tokenResponse);
             });
+            app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
+           .WithName("AuthTest");
         }
 
         public static void HandleChatBot(WebApplication app)
