@@ -70,6 +70,7 @@ export const authFetch = async (url, options = {}) => {
     if (!refreshed) {
       // Redirect to login if refresh failed
       window.location.href = "/";
+      localStorage.clear(); // Clear local storage to remove expired tokens
       throw new Error("Session expired. Please log in again.");
     }
 
