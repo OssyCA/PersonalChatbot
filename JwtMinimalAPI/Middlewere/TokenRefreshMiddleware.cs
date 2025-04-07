@@ -35,7 +35,7 @@ namespace JwtMinimalAPI.Middlewere
                     var userId = GetUserIdFromToken(token);
 
                     // Get refresh token from request cookies
-                    if (context.Request.Cookies.TryGetValue("refreshToken", out string refreshToken) && userId != Guid.Empty)
+                    if (context.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) && userId != Guid.Empty)
                     {
                         var refreshRequest = new JwtMinimalAPI.DTO.RequestRefreshTokenDto
                         {
