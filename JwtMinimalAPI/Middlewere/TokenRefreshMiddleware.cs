@@ -48,8 +48,8 @@ namespace JwtMinimalAPI.Middlewere
                             RefreshToken = refreshToken
                         };
 
-                        _logger.LogInformation("Calling RefreshTokensAsync...");
-                        var tokenResponse = await authService.RefreshTokensAsync(refreshRequest);
+                        _logger.LogInformation("Calling RefreshTokenPairAsync...");
+                        var tokenResponse = await authService.RefreshTokenPairAsync(refreshRequest);
 
                         if (tokenResponse != null)
                         {
@@ -63,7 +63,7 @@ namespace JwtMinimalAPI.Middlewere
                         }
                         else
                         {
-                            _logger.LogWarning("Token refresh failed - RefreshTokensAsync returned null");
+                            _logger.LogWarning("Token refresh failed - RefreshTokenPairAsync returned null");
                         }
                     }
                     else
@@ -96,7 +96,7 @@ namespace JwtMinimalAPI.Middlewere
                     return true;
 
                 // Check if token expires in less than set time
-                return jwtToken.ValidTo.ToUniversalTime() < DateTime.UtcNow.AddMinutes(3);
+                return jwtToken.ValidTo.ToUniversalTime() < DateTime.UtcNow.AddMinutes(5);
             }
             catch
             {

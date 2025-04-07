@@ -40,7 +40,7 @@ namespace JwtMinimalAPI.Endpoints
 
             app.MapPost("/login", async (LoginDto request, IAuthService service) =>
             {
-                var token = await service.LoginAsyc(request);
+                var token = await service.AuthenticateUserAsync(request);
                 if (token is null)
                 {
                     return Results.BadRequest("Invalid username or password");
@@ -60,7 +60,7 @@ namespace JwtMinimalAPI.Endpoints
             }).WithTags("AUTH ONLY").RequireAuthorization("AdminPolicy");
             app.MapPost("/refrshToken", async (RequestRefreshTokenDto request, IAuthService service) =>
             {
-                var result = await service.RefreshTokensAsync(request);
+                var result = await service.RefreshTokenPairAsync(request);
                 if (result is null || result.AccessToken is null || request.RefreshToken is null)
                 {
                     return Results.Unauthorized();

@@ -51,7 +51,7 @@ namespace JwtMinimalAPI.Endpoints
                 //    return Results.BadRequest(new { errors = validateErrors });
                 //}
 
-                var token = await service.LoginAsyc(request);
+                var token = await service.AuthenticateUserAsync(request);
                 if (token is null)
                 {
                     return Results.BadRequest("Invalid username or password");
@@ -73,7 +73,7 @@ namespace JwtMinimalAPI.Endpoints
             // endpoint to refresh the token
             app.MapPost("/refresh-token", async (RequestRefreshTokenDto request, IAuthService service) =>
             {
-                var tokenResponse = await service.RefreshTokensAsync(request);
+                var tokenResponse = await service.RefreshTokenPairAsync(request);
                 if (tokenResponse is null)
                 {
                     return Results.Unauthorized();

@@ -46,7 +46,7 @@ namespace JwtMinimalAPI.Services
 
             return user;
         }
-        public async Task<TokenResponseDto?> LoginAsyc(LoginDto request)
+        public async Task<TokenResponseDto?> AuthenticateUserAsync(LoginDto request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
 
@@ -61,7 +61,7 @@ namespace JwtMinimalAPI.Services
                 return null;
             }
 
-            TokenResponseDto response = await CreateTokenResponse(user);
+            TokenResponseDto response = await GenerateTokenResponseAsync(user);
             return response;
         }
         private string CreateToken(User _user)
@@ -84,22 +84,22 @@ namespace JwtMinimalAPI.Services
                 issuer: configuration.GetValue<string>("Appsettings:Issuer"),
                 audience: configuration.GetValue<string>("Appsettings:Audience"),
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(2), // To reduce the window of attack if the token is stolen
+                expires: DateTime.UtcNow.AddMinutes(15), // To reduce the window of attack if the token is stolen
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
-        private static string RefreshTokenGenerator()
+        private static string GenerateRefreshToken()
         {
             var randomNum = new byte[32];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNum);
             return Convert.ToBase64String(randomNum);
         }
-        private async Task<string> GenerateAndSaveRefreshToken(User user)
+        private async Task<string> StoreRefreshTokenAsync(User user)
         {
-            var refreshToken = RefreshTokenGenerator();
+            var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(7);
             await context.SaveChangesAsync();
@@ -117,7 +117,7 @@ namespace JwtMinimalAPI.Services
 
             return user;
         }
-        public async Task<TokenResponseDto?> RefreshTokensAsync(RequestRefreshTokenDto request)
+        public async Task<TokenResponseDto?> RefreshTokenPairAsync(RequestRefreshTokenDto request)
         {
             var user = await ValidateRefreshTokenAsync(request.UserId, request.RefreshToken);
 
@@ -125,12 +125,12 @@ namespace JwtMinimalAPI.Services
             {
                 return null;
             }
-            return await CreateTokenResponse(user);
+            return await GenerateTokenResponseAsync(user);
 
         }
-        private async Task<TokenResponseDto> CreateTokenResponse(User user)
+        private async Task<TokenResponseDto> GenerateTokenResponseAsync(User user)
         {
-            return new TokenResponseDto { AccessToken = CreateToken(user), RefreshToken = await GenerateAndSaveRefreshToken(user) };
+            return new TokenResponseDto { AccessToken = CreateToken(user), RefreshToken = await StoreRefreshTokenAsync(user) };
         }
         public async Task<bool> RevokeRefreshTokenAsync(Guid userId, string refreshToken)
         {
