@@ -10,14 +10,6 @@ const ChatBot = () => {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // Check if the user is logged in on component mount
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      navigate("/");
-    }
-  }, [navigate]);
-
   // Automatically scroll to the bottom of the messages, useEf
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
