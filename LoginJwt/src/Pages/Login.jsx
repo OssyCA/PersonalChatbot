@@ -72,7 +72,7 @@ const Login = () => {
           localStorage.setItem("userId", payload.nameid);
         }
 
-        navigate("/chatbot");
+        navigate("/user-dashboard");
       } else {
         setError("Login failed. Please try again.");
       }

@@ -85,7 +85,7 @@ namespace JwtMinimalAPI
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true, // Enable auto-replenishment so that the rate limiter will automatically replenish the limit
-                        PermitLimit = 1, // Set the limit to 5 requests
+                        PermitLimit = 5, // Set the limit to 5 requests
                         QueueLimit = 0, // Set the queue limit to 0, get a 429(to many request) response when the limit is reached
                         Window = TimeSpan.FromMinutes(100) // Set the window to 10 minutes
                     }));
