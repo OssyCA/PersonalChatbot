@@ -36,6 +36,8 @@ namespace JwtMinimalAPI
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            // NEED FIX FOR COOKIES
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins", policy => // Add a policy to the options
