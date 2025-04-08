@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JwtMinimalAPI.Endpoints
 {
-    public class TestingPoints(IConfiguration configuration)
+    public class TestingPoints()
     {
         public static void HandleUsers(WebApplication app)
         {

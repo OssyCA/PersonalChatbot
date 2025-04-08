@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace JwtMinimalAPI.Endpoints
 {
-    public class FrontendEndpoints(IConfiguration configuration)
+    public class FrontendEndpoints()
     {
         public static void HandleUser(WebApplication app)
         {
@@ -45,12 +45,6 @@ namespace JwtMinimalAPI.Endpoints
 
             app.MapPost("/login", async (LoginDto request, IAuthService service) =>
             {
-                //var validateErrors = ValidateObjects.ValidateObject(request); // to provide validation for the request 
-                //if (validateErrors.Count > 0)
-                //{
-                //    return Results.BadRequest(new { errors = validateErrors });
-                //}
-
                 var token = await service.AuthenticateUserAsync(request);
                 if (token is null)
                 {
@@ -80,6 +74,8 @@ namespace JwtMinimalAPI.Endpoints
                 }
                 return Results.Ok(tokenResponse);
             });
+
+            // endpoint to test authentication
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
         }
