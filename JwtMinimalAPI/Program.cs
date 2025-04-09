@@ -75,7 +75,8 @@ namespace JwtMinimalAPI
             builder.Services
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<ChatBotService>()
-                .AddScoped<IMailService, GmailSerivce>();
+                .AddScoped<IMailService, GmailSerivce>()
+                .AddScoped<ChangePasswordService>();
 
             builder.Services.AddRateLimiter(options => 
             {
@@ -91,9 +92,6 @@ namespace JwtMinimalAPI
                     }));
             });
 
-            builder.Logging.ClearProviders();
-            builder.Logging.AddConsole();
-            builder.Logging.AddDebug();
 
             #endregion
 
@@ -119,6 +117,8 @@ namespace JwtMinimalAPI
             //TestingPoints.HandleUsers(app);
             FrontendEndpoints.HandleUser(app);
             FrontendEndpoints.HandleChatBot(app);
+            FrontendEndpoints.ChangePassword(app);
+
             app.Run();
         }
     }
