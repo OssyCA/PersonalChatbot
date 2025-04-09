@@ -511,3 +511,80 @@ body {
   border-radius: 8px;
   font-family: 'Roboto', sans-serif;
 }
+
+.message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 3px solid #28a745;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 3px solid #dc3545;
+}
+
+.changePasswordContainer {
+  background-color: #1a202c;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.changePasswordContainer h2 {
+  color: #e2e8f0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.changePasswordContainer form {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.changePasswordContainer input {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #4a5568;
+  background-color: #2d3748;
+  color: #f7fafc;
+}
+
+.changePasswordContainer input::placeholder {
+  color: #a0aec0;
+}
+
+.changeBtn {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.changeBtn:hover {
+  background-color: #3182ce;
+}
+
+.changeBtn:disabled {
+  background-color: #718096;
+  cursor: not-allowed;
+}
