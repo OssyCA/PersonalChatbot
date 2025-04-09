@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import TokenTestButton from "../Comp/TokenTestButton";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
-  // 1. Establish basic state with correct field names
+  // Establish basic state with correct field names
   const [user, setUser] = useState({
     userId: "",
     email: "",
     username: "",
   });
+  const navigate = useNavigate();
 
-  // 2. Use useEffect to load user data from token
+  // Use useEffect to load user data from token
   useEffect(() => {
     try {
       // Get token
@@ -62,7 +64,7 @@ const UserDashboard = () => {
         <h1>User Dashboard</h1>
         <div className="user-info">
           <h2>User Information</h2>
-          {/* 9. Make sure the correct field names are used in JSX */}
+          {/* Make sure the correct field names are used in JSX */}
           <p className="info-label">
             <span className="info-value">Username: </span> {user.userId}
           </p>
@@ -74,7 +76,12 @@ const UserDashboard = () => {
             <span className="info-value">User Name: </span> {user.username}
           </p>
         </div>
-        <button className="dashboard-button">Chat bot</button>
+        <button
+          className="dashboard-button"
+          onClick={() => navigate("/chatbot")}
+        >
+          Chat bot
+        </button>
         <TokenTestButton />
       </div>
     </>

@@ -23,7 +23,7 @@ body {
   max-width: 300px;
   background: #f1f7fe;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 1em;
   color: #010101;
 }
 
@@ -31,8 +31,8 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 32px 24px 24px;
-  gap: 16px;
+  padding: 2em 1.5em 1.5em;
+  gap: 1em;
   text-align: center;
 }
 
