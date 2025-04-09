@@ -1,5 +1,8 @@
-/* Använd Roboto som standard typsnitt */
-html {
+/* 
+ * MAIN TYPOGRAPHY AND BASE STYLES
+ * Base font settings and general page structure
+ */
+ html {
   font-family: 'Roboto', sans-serif;
   background-color: #1a1c1e;
   display: flex;
@@ -9,14 +12,18 @@ html {
 }
 
 body {
-  font-family: 'Roboto', sans-serif; /* För all text */
+  font-family: 'Roboto', sans-serif;
 }
 
+/*
+ * FORM STYLES
+ * Login/signup form styling
+ */
 .form-box {
   max-width: 300px;
   background: #f1f7fe;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 1em;
   color: #010101;
 }
 
@@ -24,25 +31,25 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 32px 24px 24px;
-  gap: 16px;
+  padding: 2em 1.5em 1.5em;
+  gap: 1em;
   text-align: center;
 }
 
-/*Form text - Använd Poppins för rubriker*/
+/* Form Typography */
 .title {
-  font-family: 'Poppins', sans-serif; /* Rubrikstil */
+  font-family: 'Poppins', sans-serif;
   font-weight: bold;
   font-size: 1.6rem;
 }
 
 .subtitle {
-  font-family: 'Roboto', sans-serif; /* Underrubriker */
+  font-family: 'Roboto', sans-serif;
   font-size: 1rem;
   color: #666;
 }
 
-/*Inputs box*/
+/* Form Inputs */
 .form-container {
   overflow: hidden;
   border-radius: 8px;
@@ -81,7 +88,7 @@ body {
   text-decoration: underline;
 }
 
-/*Button - Använd Poppins för knappar*/
+/* Form Buttons */
 .form button {
   background-color: #0066ff;
   color: #fff;
@@ -99,7 +106,22 @@ body {
   background-color: #005ce6;
 }
 
-/*Chatbot*/
+.startBtn {
+  background-color: #0066ff;
+  color: #fff;
+  border: 0;
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*
+ * CHAT COMPONENT STYLES
+ */
 .chat-container {
   width: 25em;
   background-color: #f1f7fe;
@@ -110,7 +132,7 @@ body {
   overflow: hidden;
 }
 
-/* Improved chat header styling */
+/* Chat Header */
 .chat-header {
   display: flex;
   justify-content: space-between;
@@ -133,7 +155,6 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Remove old button styles as they'll be replaced with new component */
 .chat-header button {
   position: fixed;
   right: 30rem; 
@@ -150,6 +171,7 @@ body {
   box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
 }
 
+/* Chat Messages Area */
 .chat-messages {
   flex-grow: 1;
   padding: 0.9375em;
@@ -179,13 +201,13 @@ body {
   color: #333333;
 }
 
-/* Error message styling */
 .message.bot.error {
   background-color: #ffeeee;
   border-left: 3px solid #ff3b30;
   color: #d32f2f;
 }
 
+/* Chat Input Area */
 .chat-input-area {
   display: flex;
   padding: 0.625em;
@@ -193,7 +215,6 @@ body {
   gap: 0.5em;
 }
 
-/* Make textarea more responsive */
 .chat-input-area textarea {
   flex-grow: 1;
   padding: 0.8em;
@@ -245,20 +266,24 @@ body {
   transform: none;
 }
 
-.startBtn{
-  background-color: #0066ff;
-  color: #fff;
-  border: 0;
-  border-radius: 24px;
-  padding: 10px 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color .3s ease;
-  font-family: 'Poppins', sans-serif;
+/* Chat States */
+.empty-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  text-align: center;
+  padding: 2em;
 }
 
-/* Enhanced typing indicator */
+.empty-chat p {
+  margin-top: 1em;
+  font-size: 1.1em;
+}
+
+/* Typing Indicator */
 .typing-indicator {
   display: flex;
   justify-content: center;
@@ -288,41 +313,10 @@ body {
   animation-delay: 0.4s;
 }
 
-@keyframes bounce {
-  0%, 60%, 100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-6px);
-  }
-}
-
-/* Improved empty chat state */
-.empty-chat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #999;
-  text-align: center;
-  padding: 2em;
-}
-
-.empty-chat p {
-  margin-top: 1em;
-  font-size: 1.1em;
-}
-
-/* Styles for token test button */
-.token-test-container {
-  margin: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Sign out button styles (for inline styling fallback) */
+/*
+ * UI COMPONENTS
+ */
+/* Sign Out Button */
 .sign-out-button {
   display: flex;
   align-items: center;
@@ -364,6 +358,110 @@ body {
   height: 16px;
 }
 
+/* Token Test Container */
+.token-test-container {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Error Message */
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  border-left: 3px solid #d32f2f;
+}
+
+/*
+ * DASHBOARD STYLES
+ */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  background-color: #2d3748;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.dashboard-container h1 {
+  color: #f7fafc;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #4a5568;
+  padding-bottom: 0.75rem;
+}
+
+.user-info {
+  background-color: #1a202c;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.user-info h2 {
+  color: #e2e8f0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.info-label {
+  color: #a0aec0;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  align-items: baseline;
+}
+
+.info-value {
+  color: #f7fafc;
+  margin-left: 0.5rem;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+}
+
+.dashboard-button {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;  /* Reduced padding */
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 0.85rem;   /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: fit-content;   /* Makes button only as wide as its content */
+  margin: 1rem auto;    /* Center the button */
+}
+
+.dashboard-button:hover {
+  background-color: #3182ce;
+}
+
+/*
+ * ANIMATIONS
+ */
+@keyframes bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Loading Spinner */
 .loading-spinner {
   display: inline-block;
   width: 16px;
@@ -373,18 +471,43 @@ body {
   border-top-color: white;
   animation: spin 1s ease-in-out infinite;
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* Chnage password */
+.changePasswordContainer{
+  display: flex;
+  flex-direction: column;
+  margin: 2em;
+  align-items: center;
 }
 
-/* Error message in forms */
-.error-message {
-  background-color: #ffebee;
-  color: #d32f2f;
+.changeBtn{
+  margin: 1em;
+}
+
+/* Token Test */
+.token-test-container {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.token-test-button {
+  background-color: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.token-test-button:hover {
+  background-color: #005ce6;
+}
+
+.message-display {
+  margin: 10px 0;
   padding: 10px;
+  background-color: #f1f7fe;
   border-radius: 8px;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  border-left: 3px solid #d32f2f;
+  font-family: 'Roboto', sans-serif;
 }

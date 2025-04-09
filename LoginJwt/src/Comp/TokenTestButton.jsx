@@ -50,34 +50,12 @@ const TokenTestButton = () => {
   };
 
   return (
-    <div style={{ margin: "10px 0", textAlign: "center" }}>
-      <button
-        onClick={testAuthUtils}
-        style={{
-          backgroundColor: "#0066ff",
-          color: "white",
-          border: "none",
-          borderRadius: "24px",
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
+    <div className="token-test-container">
+      <button onClick={testAuthUtils} className="token-test-button">
         Test Token Refresh
       </button>
 
-      {message && (
-        <div
-          style={{
-            margin: "10px 0",
-            padding: "10px",
-            backgroundColor: "#f1f7fe",
-            borderRadius: "8px",
-          }}
-        >
-          {message}
-        </div>
-      )}
+      {message && <div className="message-display">{message}</div>}
     </div>
   );
 };

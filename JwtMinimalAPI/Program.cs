@@ -75,7 +75,8 @@ namespace JwtMinimalAPI
             builder.Services
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<ChatBotService>()
-                .AddScoped<IMailService, GmailSerivce>();
+                .AddScoped<IMailService, GmailSerivce>()
+                .AddScoped<ChangePasswordService>();
 
             builder.Services.AddRateLimiter(options => 
             {
@@ -85,15 +86,12 @@ namespace JwtMinimalAPI
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true, // Enable auto-replenishment so that the rate limiter will automatically replenish the limit
-                        PermitLimit = 1, // Set the limit to 5 requests
+                        PermitLimit = 5, // Set the limit to 5 requests
                         QueueLimit = 0, // Set the queue limit to 0, get a 429(to many request) response when the limit is reached
                         Window = TimeSpan.FromMinutes(100) // Set the window to 10 minutes
                     }));
             });
 
-            builder.Logging.ClearProviders();
-            builder.Logging.AddConsole();
-            builder.Logging.AddDebug();
 
             #endregion
 
@@ -119,6 +117,8 @@ namespace JwtMinimalAPI
             //TestingPoints.HandleUsers(app);
             FrontendEndpoints.HandleUser(app);
             FrontendEndpoints.HandleChatBot(app);
+            FrontendEndpoints.ChangePassword(app);
+
             app.Run();
         }
     }
