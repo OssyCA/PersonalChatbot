@@ -4,6 +4,7 @@ const Register = () => {
   const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -24,7 +25,9 @@ const Register = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+    console.log("User registered successfully:", data); // Handle success response
   };
+
   return (
     <div className="form-box">
       <form className="form" method="POST" onSubmit={handleSubmit}>
