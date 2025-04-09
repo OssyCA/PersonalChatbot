@@ -124,3 +124,6 @@ export const authFetch = async (url, options = {}) => {
 
   return response;
 };
+
+// Ping for autorefresh token
+export const PingToken = async () => {};

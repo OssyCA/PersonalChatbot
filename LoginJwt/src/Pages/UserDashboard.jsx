@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TokenTestButton from "../Comp/TokenTestButton";
 import { useNavigate } from "react-router-dom";
+import ChangePasswordForm from "../Comp/ChangePasswordForm";
 
 const UserDashboard = () => {
   // Establish basic state with correct field names
@@ -76,6 +77,7 @@ const UserDashboard = () => {
             <span className="info-value">User Name: </span> {user.username}
           </p>
         </div>
+        <ChangePasswordForm />
         <button
           className="dashboard-button"
           onClick={() => navigate("/chatbot")}
