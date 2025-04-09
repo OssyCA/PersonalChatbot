@@ -52,7 +52,12 @@ const UserDashboard = () => {
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
           ] || "",
       };
-
+      localStorage.setItem(
+        "username",
+        tokenPayload[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        ]
+      );
       setUser(updatedUser);
     } catch (error) {
       console.error(error); // Show full error details
