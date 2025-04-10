@@ -92,7 +92,7 @@ namespace JwtMinimalAPI.Endpoints
         }
         public static void ChangePassword(WebApplication app)
         {
-            app.MapPut("change-password", async (ChangePasswordService change, ChangePasswordDto dto) =>
+            app.MapPost("change-password", async (ChangePasswordService change, ChangePasswordDto dto) =>
             {
                 var changedPassword = await change.ChangedPassword(dto);
 
