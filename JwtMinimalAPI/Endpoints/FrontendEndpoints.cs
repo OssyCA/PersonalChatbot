@@ -1,8 +1,10 @@
 ﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers;
 using JwtMinimalAPI.Helpers.EmailConfig;
+using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace JwtMinimalAPI.Endpoints
 {
@@ -87,6 +89,22 @@ namespace JwtMinimalAPI.Endpoints
                 var chatResponse = await service.GetResponse(inputMessage);
                 return Results.Ok(chatResponse);
             }).RequireAuthorization();
+        }
+        public static void ChangePassword(WebApplication app)
+        {
+            app.MapPut("change-password", async (ChangePasswordService change, ChangePasswordDto dto) =>
+            {
+                var changedPassword = await change.ChangedPassword(dto);
+
+                if (changedPassword)
+                {
+                    return Results.Ok("Passwordchanged");
+                }
+                else
+                {
+                    return Results.BadRequest();
+                }
+            });
         }
     }
 }

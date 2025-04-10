@@ -3,9 +3,13 @@ import { authFetch } from "../Utils/AuthUtils";
 
 const TokenTestButton = () => {
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(""); // "success" or "error"
 
   const testAuthUtils = async () => {
     setMessage("Testing token refresh with AuthUtils...");
+    setStatus("");
+    setLoading(true);
 
     try {
       // Get current tokens for comparison
@@ -14,6 +18,8 @@ const TokenTestButton = () => {
 
       if (!oldAccessToken || !oldRefreshToken) {
         setMessage("❌ Missing tokens in localStorage");
+        setStatus("error");
+        setLoading(false);
         return;
       }
 
@@ -33,48 +39,40 @@ const TokenTestButton = () => {
           oldRefreshToken !== newRefreshToken
         ) {
           setMessage("✅ Request succeeded and tokens were refreshed!");
+          setStatus("success");
         } else {
           setMessage(
             "✅ Request succeeded but tokens weren't refreshed (not expired yet)"
           );
+          setStatus("success");
         }
       } else {
         setMessage(
           `❌ Request failed: ${response.status} ${response.statusText}`
         );
+        setStatus("error");
       }
     } catch (error) {
       setMessage(`❌ Error: ${error.message}`);
+      setStatus("error");
       console.error("Test error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ margin: "10px 0", textAlign: "center" }}>
+    <div className="token-test-container">
       <button
         onClick={testAuthUtils}
-        style={{
-          backgroundColor: "#0066ff",
-          color: "white",
-          border: "none",
-          borderRadius: "24px",
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
+        className="token-test-button"
+        disabled={loading}
       >
-        Test Token Refresh
+        {loading ? "Testing..." : "Test Token Refresh"}
       </button>
 
       {message && (
-        <div
-          style={{
-            margin: "10px 0",
-            padding: "10px",
-            backgroundColor: "#f1f7fe",
-            borderRadius: "8px",
-          }}
-        >
+        <div className={`message-display ${status ? status : ""}`}>
           {message}
         </div>
       )}

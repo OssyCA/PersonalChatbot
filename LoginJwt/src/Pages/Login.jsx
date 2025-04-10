@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -8,13 +8,13 @@ const Login = () => {
   const [loading, setLoading] = useState(false); // State to hold loading status
   const navigate = useNavigate();
 
-  // In production, you would want to check if the user is already logged in and redirect them to the ChatBot page
-  React.useEffect(() => {
+  // Check if the user is already logged in and redirect them to the dashboard
+  useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
-      navigate("/chatbot"); // Redirect to ChatBot if already logged in
+      navigate("/user-dashboard"); // Redirect if already logged in
     }
-  }, [navigate]); // navigate is a dependency to avoid linting errors
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,21 +58,21 @@ const Login = () => {
 
       const responseData = await response.json();
 
-      // If successful login, save tokens in localStorage and navigate to ChatBot
+      // If successful login, save tokens in localStorage and navigate to dashboard
       if (responseData && responseData.accessToken) {
         // Save tokens in localStorage
         localStorage.setItem("accessToken", responseData.accessToken);
         localStorage.setItem("refreshToken", responseData.refreshToken);
+
         // Store user ID if it's included in the response or decoded from the token
-        // This is needed for the refresh token functionality
         const payload = JSON.parse(
-          atob(responseData.accessToken.split(".")[1]) // atob decodes the base64 string
+          atob(responseData.accessToken.split(".")[1])
         );
         if (payload.nameid) {
           localStorage.setItem("userId", payload.nameid);
         }
 
-        navigate("/chatbot");
+        navigate("/user-dashboard");
       } else {
         setError("Login failed. Please try again.");
       }
@@ -88,7 +88,7 @@ const Login = () => {
     <div className="form-box">
       <form className="form" onSubmit={handleSubmit}>
         <span className="title">Sign in</span>
-        <span className="subtitle">Sign in with your Username.</span>
+        <span className="subtitle">Access your account</span>
 
         {error && <div className="error-message">{error}</div>}
 
@@ -116,7 +116,7 @@ const Login = () => {
       </form>
       <div className="form-section">
         <p>
-          <a href="">Forgot password?</a>
+          <a href="#">Forgot password?</a>
         </p>
         <p>
           <a href="/register">Don't have an account?</a>

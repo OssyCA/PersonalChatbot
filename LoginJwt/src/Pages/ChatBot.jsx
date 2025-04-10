@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../Utils/AuthUtils"; // Import the authFetch utility
-import TokenTestButton from "../Comp/TokenTestButton"; // Import the TokenTestButton component
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -10,10 +9,21 @@ const ChatBot = () => {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // Automatically scroll to the bottom of the messages, useEf
+  // Automatically scroll to the bottom of the messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Add a welcome message when component mounts
+  useEffect(() => {
+    const username = localStorage.getItem("username") || "User";
+    setMessages([
+      {
+        text: `Hello ${username}! How can I help you today?`,
+        sender: "bot",
+      },
+    ]);
+  }, []);
 
   const sendMessage = () => {
     if (input.trim() && !isLoading) {
@@ -112,15 +122,24 @@ const ChatBot = () => {
     }
   };
 
+  const handleBackToDashboard = () => {
+    navigate("/user-dashboard");
+  };
+
   return (
     <div className="chat-container">
       <div className="chat-header">
         <h1>ChatBot</h1>
-        <button onClick={handleLogout} className="logout-button">
-          Sign out
-        </button>
+        <div className="header-buttons">
+          <button onClick={handleBackToDashboard} className="back-button">
+            Dashboard
+          </button>
+          <button onClick={handleLogout} className="logout-button">
+            Sign out
+          </button>
+        </div>
       </div>
-      <TokenTestButton />
+
       <div className="chat-messages">
         {messages.length === 0 ? (
           <div className="empty-chat">
@@ -147,6 +166,7 @@ const ChatBot = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
+
       <div className="chat-input-area">
         <textarea
           placeholder="Type a message..."
