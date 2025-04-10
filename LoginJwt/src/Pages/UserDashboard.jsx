@@ -12,15 +12,21 @@ const UserDashboard = () => {
   });
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
+
   // Use useEffect to load user data from token
   useEffect(() => {
     try {
       // Get token
       const token = localStorage.getItem("accessToken");
 
-      // 4. Check if token exists
+      // Check if token exists
       if (!token) {
         console.log("No token found");
+        navigate("/login");
         return;
       }
 
@@ -65,33 +71,42 @@ const UserDashboard = () => {
   }, []); // once it mounts
 
   return (
-    <>
-      <div className="dashboard-container">
+    <div className="dashboard-container">
+      <div className="dashboard-header">
         <h1>User Dashboard</h1>
-        <div className="user-info">
-          <h2>User Information</h2>
-          {/* Make sure the correct field names are used in JSX */}
+        <button className="logout-button" onClick={handleLogout}>
+          Sign Out
+        </button>
+      </div>
+
+      <div className="user-info panel">
+        <h2>User Information</h2>
+        <div className="user-info-content">
           <p className="info-label">
-            <span className="info-value">Username: </span> {user.userId}
+            User ID: <span className="info-value">{user.userId}</span>
           </p>
           <p className="info-label">
-            <span className="info-value">User Email: </span>
-            {user.email}
+            Email: <span className="info-value">{user.email}</span>
           </p>
           <p className="info-label">
-            <span className="info-value">User Name: </span> {user.username}
+            Username: <span className="info-value">{user.username}</span>
           </p>
         </div>
-        <ChangePasswordForm />
+      </div>
+
+      <ChangePasswordForm />
+
+      <div className="dashboard-actions">
         <button
           className="dashboard-button"
           onClick={() => navigate("/chatbot")}
         >
-          Chat bot
+          Open Chatbot
         </button>
-        <TokenTestButton />
       </div>
-    </>
+
+      <TokenTestButton />
+    </div>
   );
 };
 
