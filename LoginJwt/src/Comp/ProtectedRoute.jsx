@@ -1,31 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  // Simple check for username in localStorage
+  const isLoggedIn = !!localStorage.getItem("username");
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("https://localhost:7289/api/auth-test", {
-          credentials: "include",
-        });
-        setIsAuthenticated(response.ok);
-      } catch (error) {
-        console.error("Auth check error:", error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  // Show loading state while checking
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+  // If not logged in, redirect to login
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  // If logged in, render the protected route
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

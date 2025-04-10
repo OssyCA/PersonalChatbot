@@ -13,32 +13,6 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch user data on component mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("https://localhost:7289/api/auth-test", {
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          // Not authenticated, redirect to login
-          navigate("/login");
-          return;
-        }
-
-        // Optionally fetch more user details if needed
-        // For now, we're just using what we saved during login
-        setLoading(false);
-      } catch (error) {
-        console.error("Auth check error:", error);
-        navigate("/login");
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
-
   const handleLogout = async () => {
     try {
       await fetch("https://localhost:7289/logout", {

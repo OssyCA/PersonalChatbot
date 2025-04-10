@@ -8,22 +8,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Check if user is already logged in
-  useEffect(() => {
-    // Try to access auth test endpoint to check authentication status
-    fetch("https://localhost:7289/api/auth-test", {
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          navigate("/user-dashboard");
-        }
-      })
-      .catch((error) => {
-        console.error("Auth check error:", error);
-      });
-  }, [navigate]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
