@@ -23,11 +23,6 @@ const TokenTestButton = () => {
         return;
       }
 
-      // Make a request using authFetch which handles token refresh
-      const response = await authFetch("https://localhost:7289/api/auth-test", {
-        method: "GET",
-      });
-
       // Get new tokens after request
       const newAccessToken = localStorage.getItem("accessToken");
       const newRefreshToken = localStorage.getItem("refreshToken");

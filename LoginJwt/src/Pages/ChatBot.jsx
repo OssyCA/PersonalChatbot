@@ -45,7 +45,12 @@ const ChatBot = () => {
 
   const botResponse = async (userMessage) => {
     try {
-      // Use the authFetch utility that handles token refresh
+      // Add console logs to debug the issue
+      console.log(
+        "Sending request to:",
+        `https://localhost:7289/InputMessage/${encodeURIComponent(userMessage)}`
+      );
+
       const response = await authFetch(
         `https://localhost:7289/InputMessage/${encodeURIComponent(
           userMessage
@@ -54,6 +59,27 @@ const ChatBot = () => {
           method: "POST",
         }
       );
+
+      console.log("Response status:", response.status);
+
+      if (response.status === 401) {
+        // Handle unauthorized specifically
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            text: "Your session has expired. Please log in again.",
+            sender: "bot",
+            isError: true,
+          },
+        ]);
+
+        // Give the user a chance to see the message before redirecting
+        setTimeout(() => {
+          localStorage.clear();
+          navigate("/login");
+        }, 3000);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(

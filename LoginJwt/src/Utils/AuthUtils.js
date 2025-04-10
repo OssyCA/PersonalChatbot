@@ -3,7 +3,7 @@
 
 // Create an authenticated fetch that works with cookies
 export const authFetch = async (url, options = {}) => {
-  // Include credentials to allow cookies to be sent
+  // Make sure credentials are included
   const authOptions = {
     ...options,
     credentials: "include", // This is crucial for cookies
@@ -13,42 +13,37 @@ export const authFetch = async (url, options = {}) => {
     },
   };
 
-  // Make the request
-  let response = await fetch(url, authOptions);
+  try {
+    // Make the request
+    let response = await fetch(url, authOptions);
 
-  // Handle 401 Unauthorized
-  if (response.status === 401) {
-    // Try to refresh token automatically by calling refresh endpoint
-    const refreshResponse = await fetch(
-      "https://localhost:7289/refresh-token",
-      {
-        method: "POST",
-        credentials: "include",
+    // Handle 401 Unauthorized
+    if (response.status === 401) {
+      console.log("Unauthorized, attempting to refresh token...");
+
+      // Try to refresh token automatically
+      const refreshResponse = await fetch(
+        "https://localhost:7289/refresh-token",
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!refreshResponse.ok) {
+        console.error("Failed to refresh token", await refreshResponse.text());
+        // Don't redirect immediately, just return the error response
+        return response;
       }
-    );
 
-    if (!refreshResponse.ok) {
-      // Redirect to login if refresh failed
-      window.location.href = "/login";
-      throw new Error("Session expired. Please log in again.");
+      console.log("Token refreshed successfully, retrying original request");
+      // Retry the original request
+      return fetch(url, authOptions);
     }
 
-    // Retry the original request
-    return fetch(url, authOptions);
-  }
-
-  return response;
-};
-
-// Helper function to check if user is authenticated
-export const isAuthenticated = async () => {
-  try {
-    const response = await fetch("https://localhost:7289/api/auth-test", {
-      credentials: "include",
-    });
-    return response.ok;
+    return response;
   } catch (error) {
-    console.error("Auth check error:", error);
-    return false;
+    console.error("authFetch error:", error);
+    throw error;
   }
 };
