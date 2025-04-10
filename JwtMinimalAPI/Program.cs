@@ -41,7 +41,7 @@ namespace JwtMinimalAPI
             {
                 options.AddPolicy("AllowAllOrigins", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173") // Update with your React app URL
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:5174") // Update with your React app URL
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials(); // This is important for cookies
@@ -88,7 +88,7 @@ namespace JwtMinimalAPI
                         AutoReplenishment = true, // Enable auto-replenishment so that the rate limiter will automatically replenish the limit
                         PermitLimit = 5, // Set the limit to 5 requests
                         QueueLimit = 0, // Set the queue limit to 0, get a 429(to many request) response when the limit is reached
-                        Window = TimeSpan.FromMinutes(100) // Set the window to 10 minutes
+                        Window = TimeSpan.FromMinutes(10) // Set the window to 10 minutes
                     }));
             });
 
