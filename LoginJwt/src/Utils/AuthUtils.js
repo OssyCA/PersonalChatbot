@@ -20,9 +20,10 @@ export const isTokenExpired = (token) => {
 // Refresh the access token using the refresh token
 export const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
+  const userId = localStorage.getItem("userId");
 
-  if (!refreshToken) {
-    // No refresh token user needs to log in again
+  if (!refreshToken || !userId) {
+    // No refresh token or userId, user needs to log in again
     return false;
   }
 
@@ -125,5 +126,34 @@ export const authFetch = async (url, options = {}) => {
   return response;
 };
 
-// Ping for autorefresh token
-export const PingToken = async () => {};
+// Helper function to get user info from JWT token
+export const getUserInfoFromToken = () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) return null;
+
+  try {
+    const tokenParts = token.split(".");
+    if (tokenParts.length !== 3) return null;
+
+    const decodedPart = atob(tokenParts[1]);
+    const tokenPayload = JSON.parse(decodedPart);
+
+    return {
+      userId:
+        tokenPayload[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ] || "",
+      username:
+        tokenPayload[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        ] || "",
+      email:
+        tokenPayload[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        ] || "",
+    };
+  } catch (error) {
+    console.error("Error parsing token:", error);
+    return null;
+  }
+};
