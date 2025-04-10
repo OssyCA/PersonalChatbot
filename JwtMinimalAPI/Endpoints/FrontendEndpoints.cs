@@ -77,7 +77,7 @@ namespace JwtMinimalAPI.Endpoints
                 return Results.Ok(tokenResponse);
             });
 
-            // endpoint to test authentication
+            // endpoint to test authentication // REMOVE 
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
         }
