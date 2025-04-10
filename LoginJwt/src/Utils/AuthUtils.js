@@ -1,9 +1,8 @@
 // src/Utils/AuthUtils.js
 export const authFetch = async (url, options = {}) => {
-  // Make sure credentials are included
   const authOptions = {
     ...options,
-    credentials: "include", // This is crucial for cookies
+    credentials: "include", // For cookies
     headers: {
       ...(options.headers || {}),
       "Content-Type": "application/json",
@@ -11,39 +10,35 @@ export const authFetch = async (url, options = {}) => {
   };
 
   try {
-    // Make the request
+    // First attempt
     let response = await fetch(url, authOptions);
 
-    // Handle 401 Unauthorized
+    // If unauthorized, try refresh once
     if (response.status === 401) {
-      console.log("Unauthorized, attempting to refresh token...");
+      console.log("Unauthorized, attempting token refresh...");
 
-      // Try to refresh token automatically
       const refreshResponse = await fetch(
         "https://localhost:7289/refresh-token",
         {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
 
-      if (!refreshResponse.ok) {
-        console.error("Failed to refresh token", await refreshResponse.text());
-        // Return the original error response
+      if (refreshResponse.ok) {
+        console.log("Token refreshed, retrying original request");
+        // Retry original request
+        return fetch(url, authOptions);
+      } else {
+        console.log("Refresh failed, returning 401");
+        // If refresh failed, we're truly unauthorized
         return response;
       }
-
-      console.log("Token refreshed successfully, retrying original request");
-      // Retry the original request with the same options
-      return fetch(url, authOptions);
     }
 
     return response;
   } catch (error) {
-    console.error("authFetch error:", error);
+    console.error("Auth fetch error:", error);
     throw error;
   }
 };

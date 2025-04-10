@@ -64,7 +64,7 @@ namespace JwtMinimalAPI.Services
             TokenResponseDto response = await GenerateTokenResponseAsync(user);
             return response;
         }
-        private string CreateToken(User _user)
+        public string CreateToken(User _user)
         {
             var claims = new List<Claim>
             {
@@ -78,7 +78,7 @@ namespace JwtMinimalAPI.Services
                 Encoding.UTF8.GetBytes(configuration.GetValue<string>("Appsettings:Token")!));
 
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512); // need 64 characters
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
             var tokenDescriptor = new JwtSecurityToken(
                 issuer: configuration.GetValue<string>("Appsettings:Issuer"),
@@ -90,7 +90,7 @@ namespace JwtMinimalAPI.Services
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
-        private static string GenerateRefreshToken()
+        public string GenerateRefreshToken()
         {
             var randomNum = new byte[32];
             using var rng = RandomNumberGenerator.Create();
@@ -148,5 +148,13 @@ namespace JwtMinimalAPI.Services
 
             return true;
         } // Fix blacklisted tokens in the future
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            return await context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        }
+        public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
     }
 }

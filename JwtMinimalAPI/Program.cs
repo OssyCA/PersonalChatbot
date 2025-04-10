@@ -65,6 +65,14 @@ namespace JwtMinimalAPI
                         Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Appsettings:Token")!)),
                     ValidateIssuerSigningKey = true
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["accessToken"];
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             // Get the GmailOptions section from the appsettings.json file

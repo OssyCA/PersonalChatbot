@@ -1,10 +1,12 @@
-﻿using JwtMinimalAPI.DTO;
+﻿using JwtMinimalAPI.Data;
+using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers;
 using JwtMinimalAPI.Helpers.EmailConfig;
 using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -48,6 +50,7 @@ namespace JwtMinimalAPI.Endpoints
             });
 
             // In the login endpoint
+            // In FrontendEndpoints.cs
             app.MapPost("/login", async (LoginDto request, IAuthService service, HttpContext httpContext) =>
             {
                 var tokenResponse = await service.AuthenticateUserAsync(request);
@@ -56,106 +59,102 @@ namespace JwtMinimalAPI.Endpoints
                     return Results.BadRequest("Invalid username or password");
                 }
 
-                // Set access token in HTTP-only cookie
-                httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
+                // Get the user info
+                var user = await service.GetUserByUsernameAsync(request.UserName);
+                if (user == null)
                 {
-                    HttpOnly = true,
-                    Secure = true, // Use in production with HTTPS
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(15) // Match token expiration
-                });
-
-                // Set refresh token in HTTP-only cookie
-                httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // Use in production with HTTPS
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7) // Match token expiration
-                });
-
-                // Send user info that's needed on the client side
-                var payload = GetUserInfoFromToken(tokenResponse.AccessToken);
-                return Results.Ok(new
-                {
-                    userId = payload.UserId,
-                    username = payload.Username,
-                    email = payload.Email
-                });
-
-            }).RequireRateLimiting("login");
-
-
-
-            app.MapPost("/logout", async (IAuthService service, HttpContext httpContext) =>
-            {
-                // Get user ID and refresh token from cookies
-                var refreshToken = httpContext.Request.Cookies["refreshToken"];
-                // Get user ID from the token claim
-                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (userId != null && refreshToken != null)
-                {
-                    var result = await service.RevokeRefreshTokenAsync(Guid.Parse(userId), refreshToken);
+                    return Results.BadRequest("User not found");
                 }
 
-                // Clear cookies regardless of revoke result
-                httpContext.Response.Cookies.Delete("accessToken");
-                httpContext.Response.Cookies.Delete("refreshToken");
-
-                return Results.Ok("Logout successful");
-            }).RequireAuthorization();
-
-            // endpoint to refresh the token
-            // Update refresh token endpoint
-            app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service) =>
-            {
-                var refreshToken = httpContext.Request.Cookies["refreshToken"];
-                // For user ID, we could either get it from the cookie or from a claim if authenticated
-                // For this example, we'll get it from the user claim if available
-                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(refreshToken))
-                {
-                    return Results.Unauthorized();
-                }
-
-                var request = new RequestRefreshTokenDto
-                {
-                    UserId = Guid.Parse(userId),
-                    RefreshToken = refreshToken
-                };
-
-                var tokenResponse = await service.RefreshTokenPairAsync(request);
-                if (tokenResponse is null)
-                {
-                    return Results.Unauthorized();
-                }
-
-                // Set new access token
+                // Set cookies
                 httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(15)
                 });
 
-                // Set new refresh token
                 httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddDays(7)
                 });
 
-                return Results.Ok(new { success = true });
+                // Return user info (excluding password)
+                return Results.Ok(new
+                {
+                    userId = user.UserId.ToString(),
+                    username = user.UserName,
+                    email = user.Email
+                });
             });
 
+
+
+            app.MapPost("/logout", (HttpContext httpContext) =>
+            {
+                // Clear cookies
+                httpContext.Response.Cookies.Delete("accessToken");
+                httpContext.Response.Cookies.Delete("refreshToken");
+
+                return Results.Ok("Logged out successfully");
+            });
+
+            // endpoint to refresh the token
+            // Update refresh token endpoint
+            // In FrontendEndpoints.cs
+            // In FrontendEndpoints.cs
+            app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service, MiniJwtDbContext dbContext) =>
+            {
+                // Check if refresh token exists in cookies
+                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out string refreshToken))
+                {
+                    return Results.Unauthorized();
+                }
+
+                // Find user with this refresh token
+                var user = await dbContext.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+                if (user == null || user.RefreshTokenExpireTime <= DateTime.UtcNow)
+                {
+                    return Results.Unauthorized();
+                }
+
+                // Generate new token pair
+                var accessToken = service.CreateToken(user); // Create a public method for token creation
+                var newRefreshToken = service.GenerateRefreshToken(); // Make this public
+
+                // Update user in database
+                user.RefreshToken = newRefreshToken;
+                user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(7);
+                await dbContext.SaveChangesAsync();
+
+                // Set cookies
+                httpContext.Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // For HTTPS
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddMinutes(15)
+                });
+
+                httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // For HTTPS
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(7)
+                });
+
+                return Results.Ok(new { success = true });
+            }).AllowAnonymous(); // Important - make sure this endpoint is accessible without authentication
             // endpoint to test authentication
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
+            // In FrontendEndpoints.cs
+            app.MapGet("/api/public-test", () => Results.Ok(new { message = "This is a public endpoint" }));
         }
         private static dynamic GetUserInfoFromToken(string token)
         {

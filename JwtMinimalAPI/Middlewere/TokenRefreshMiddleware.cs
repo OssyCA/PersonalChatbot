@@ -1,8 +1,10 @@
 ﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Services;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace JwtMinimalAPI.Middlewere
 {
@@ -10,31 +12,36 @@ namespace JwtMinimalAPI.Middlewere
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<TokenRefreshMiddleware> _logger;
+        private readonly IConfiguration _configuration;
 
 
-        public TokenRefreshMiddleware(RequestDelegate next, ILogger<TokenRefreshMiddleware> logger)
+        public TokenRefreshMiddleware(RequestDelegate next, ILogger<TokenRefreshMiddleware> logger, IConfiguration configuration)
         {
             _next = next;
             _logger = logger;
+            _configuration = configuration;
         }
         // NEED FIX FOR COOKIES
         // In TokenRefreshMiddleware.cs
         public async Task InvokeAsync(HttpContext context)
         {
-
-            // Check if access token cookie exists
-            if (context.Request.Cookies.TryGetValue("accessToken", out string token))
+            // Only try to refresh if we have both cookies
+            if (context.Request.Cookies.TryGetValue("accessToken", out string token) &&
+                context.Request.Cookies.TryGetValue("refreshToken", out string refreshToken))
             {
-                var authService = context.RequestServices.GetRequiredService<IAuthService>(); // Get auth service
-                // Check if token is about to expire 
-                if (IsTokenNearExpiration(token))
+                // Only refresh if token is actually near expiration or invalid
+                if (!IsTokenValid(token) || IsTokenNearExpiration(token))
                 {
-                    // Get refresh token from cookie
-                    if (context.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-                    {
-                        var userId = GetUserIdFromToken(token);
+                    var authService = context.RequestServices.GetRequiredService<IAuthService>();
 
-                        if (userId != Guid.Empty)
+                    try
+                    {
+                        // Extract user ID from token even if expired
+                        var handler = new JwtSecurityTokenHandler();
+                        var tokenWithoutValidation = handler.ReadJwtToken(token);
+                        var userIdClaim = tokenWithoutValidation.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                        if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out Guid userId))
                         {
                             var refreshRequest = new RequestRefreshTokenDto
                             {
@@ -66,12 +73,43 @@ namespace JwtMinimalAPI.Middlewere
                             }
                         }
                     }
+                    catch
+                    {
+                        // Silently fail - we'll continue to the endpoint which will
+                        // return 401 if token is truly invalid
+                    }
                 }
             }
 
             await _next(context);
         }
+        private bool IsTokenValid(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = new TokenValidationParameters
+                {
+                    // These should match your token validation parameters
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Appsettings:Token"])),
+                    ValidateIssuer = true,
+                    ValidIssuer = _configuration["Appsettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["Appsettings:Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
 
+                // Validate the token
+                tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private bool IsTokenNearExpiration(string token)
         {
             try
