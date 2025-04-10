@@ -5,6 +5,8 @@ using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace JwtMinimalAPI.Endpoints
 {
@@ -45,43 +47,128 @@ namespace JwtMinimalAPI.Endpoints
 
             });
 
-            app.MapPost("/login", async (LoginDto request, IAuthService service) =>
+            // In the login endpoint
+            app.MapPost("/login", async (LoginDto request, IAuthService service, HttpContext httpContext) =>
             {
-                var token = await service.AuthenticateUserAsync(request);
-                if (token is null)
+                var tokenResponse = await service.AuthenticateUserAsync(request);
+                if (tokenResponse is null)
                 {
                     return Results.BadRequest("Invalid username or password");
                 }
-                return Results.Ok(token);
+
+                // Set access token in HTTP-only cookie
+                httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Use in production with HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15) // Match token expiration
+                });
+
+                // Set refresh token in HTTP-only cookie
+                httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Use in production with HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7) // Match token expiration
+                });
+
+                // Send user info that's needed on the client side
+                var payload = GetUserInfoFromToken(tokenResponse.AccessToken);
+                return Results.Ok(new
+                {
+                    userId = payload.UserId,
+                    username = payload.Username,
+                    email = payload.Email
+                });
 
             }).RequireRateLimiting("login");
 
-            app.MapPost("/logout", async (RequestRefreshTokenDto request, IAuthService service) =>
+
+
+            app.MapPost("/logout", async (IAuthService service, HttpContext httpContext) =>
             {
-                var result = await service.RevokeRefreshTokenAsync(request.UserId, request.RefreshToken);
-                if (!result)
+                // Get user ID and refresh token from cookies
+                var refreshToken = httpContext.Request.Cookies["refreshToken"];
+                // Get user ID from the token claim
+                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userId != null && refreshToken != null)
                 {
-                    return Results.BadRequest("Invalid token");
+                    var result = await service.RevokeRefreshTokenAsync(Guid.Parse(userId), refreshToken);
                 }
+
+                // Clear cookies regardless of revoke result
+                httpContext.Response.Cookies.Delete("accessToken");
+                httpContext.Response.Cookies.Delete("refreshToken");
+
                 return Results.Ok("Logout successful");
             }).RequireAuthorization();
 
             // endpoint to refresh the token
-            app.MapPost("/refresh-token", async (RequestRefreshTokenDto request, IAuthService service) =>
+            // Update refresh token endpoint
+            app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service) =>
             {
+                var refreshToken = httpContext.Request.Cookies["refreshToken"];
+                // For user ID, we could either get it from the cookie or from a claim if authenticated
+                // For this example, we'll get it from the user claim if available
+                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(refreshToken))
+                {
+                    return Results.Unauthorized();
+                }
+
+                var request = new RequestRefreshTokenDto
+                {
+                    UserId = Guid.Parse(userId),
+                    RefreshToken = refreshToken
+                };
+
                 var tokenResponse = await service.RefreshTokenPairAsync(request);
                 if (tokenResponse is null)
                 {
                     return Results.Unauthorized();
                 }
-                return Results.Ok(tokenResponse);
+
+                // Set new access token
+                httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                });
+
+                // Set new refresh token
+                httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                });
+
+                return Results.Ok(new { success = true });
             });
 
             // endpoint to test authentication
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
         }
+        private static dynamic GetUserInfoFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
+            return new
+            {
+                UserId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
+                Username = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+                Email = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value
+            };
+        }
         public static void HandleChatBot(WebApplication app)
         {
             app.MapPost("/InputMessage/{inputMessage}", async (ChatBotService service, string inputMessage) =>

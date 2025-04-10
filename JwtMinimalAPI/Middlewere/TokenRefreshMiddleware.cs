@@ -11,74 +11,61 @@ namespace JwtMinimalAPI.Middlewere
         private readonly RequestDelegate _next;
         private readonly ILogger<TokenRefreshMiddleware> _logger;
 
+
         public TokenRefreshMiddleware(RequestDelegate next, ILogger<TokenRefreshMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
         // NEED FIX FOR COOKIES
+        // In TokenRefreshMiddleware.cs
         public async Task InvokeAsync(HttpContext context)
         {
 
-            // Get service during request insted of at startup
-            var authService = context.RequestServices.GetRequiredService<IAuthService>();
-
-            // Check if Authorization header is present
-            if (context.Request.Headers.TryGetValue("Authorization", out StringValues authHeader) &&
-                authHeader.ToString().StartsWith("Bearer "))
+            // Check if access token cookie exists
+            if (context.Request.Cookies.TryGetValue("accessToken", out string token))
             {
-                var token = authHeader.ToString().Substring("Bearer ".Length).Trim();
-
+                var authService = context.RequestServices.GetRequiredService<IAuthService>(); // Get auth service
                 // Check if token is about to expire 
                 if (IsTokenNearExpiration(token))
                 {
-                    _logger.LogInformation("Token is near expiration, attempting to refresh");
-
-                    // Get user ID from token claims
-                    var userId = GetUserIdFromToken(token);
-
-                    // Get refresh token from custom header
-                    if (context.Request.Headers.TryGetValue("X-Refresh-Token", out var refreshToken) && userId != Guid.Empty)
+                    // Get refresh token from cookie
+                    if (context.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
                     {
-                        _logger.LogInformation($"Refresh token found in headers. User ID: {userId}");
+                        var userId = GetUserIdFromToken(token);
 
-                        var refreshRequest = new RequestRefreshTokenDto
+                        if (userId != Guid.Empty)
                         {
-                            UserId = userId,
-                            RefreshToken = refreshToken
-                        };
+                            var refreshRequest = new RequestRefreshTokenDto
+                            {
+                                UserId = userId,
+                                RefreshToken = refreshToken
+                            };
 
-                        _logger.LogInformation("Calling RefreshTokenPairAsync...");
-                        var tokenResponse = await authService.RefreshTokenPairAsync(refreshRequest);
+                            var tokenResponse = await authService.RefreshTokenPairAsync(refreshRequest);
 
-                        if (tokenResponse != null)
-                        {
-                            // Set the new access token in the request header
-                            context.Request.Headers["Authorization"] = $"Bearer {tokenResponse.AccessToken}";
+                            if (tokenResponse != null)
+                            {
+                                // Set new access token cookie
+                                context.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
+                                {
+                                    HttpOnly = true,
+                                    Secure = true,
+                                    SameSite = SameSiteMode.Strict,
+                                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                                });
 
-                            // Add new tokens to response headers
-                            _logger.LogInformation("Tokens refreshed successfully");
-                            context.Response.Headers.Append("X-Access-Token", tokenResponse.AccessToken);
-                            context.Response.Headers.Append("X-Refresh-Token", tokenResponse.RefreshToken);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Token refresh failed - RefreshTokenPairAsync returned null");
+                                // Set new refresh token cookie
+                                context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
+                                {
+                                    HttpOnly = true,
+                                    Secure = true,
+                                    SameSite = SameSiteMode.Strict,
+                                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                                });
+                            }
                         }
                     }
-                    else
-                    {
-                        if (!context.Request.Headers.TryGetValue("X-Refresh-Token", out _))
-                        {
-                            _logger.LogWarning("X-Refresh-Token header not found in request");
-                        }
-
-                        if (userId == Guid.Empty)
-                        {
-                            _logger.LogWarning("User ID from token is empty or invalid");
-                        }
-                    }
-
                 }
             }
 

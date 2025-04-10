@@ -37,16 +37,14 @@ namespace JwtMinimalAPI
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            // NEED FIX FOR COOKIES
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", policy => // Add a policy to the options
+                options.AddPolicy("AllowAllOrigins", policy =>
                 {
-                    policy.AllowAnyOrigin(); // Allow any origin
-                    policy.AllowAnyMethod(); // Allow any method
-                    policy.AllowAnyHeader(); // Allow any header
-                    policy.WithExposedHeaders("X-Access-Token", "X-Refresh-Token"); // Expose the headers to the client
-
+                    policy.WithOrigins("http://localhost:5173") // Update with your React app URL
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials(); // This is important for cookies
                 });
             });
             builder.Services.AddDbContext<MiniJwtDbContext>(options =>

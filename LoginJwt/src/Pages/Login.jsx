@@ -4,24 +4,31 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // State to hold error message
-  const [loading, setLoading] = useState(false); // State to hold loading status
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Check if the user is already logged in and redirect them to the dashboard
+  // Check if user is already logged in
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      navigate("/user-dashboard"); // Redirect if already logged in
-    }
+    // Try to access auth test endpoint to check authentication status
+    fetch("https://localhost:7289/api/auth-test", {
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          navigate("/user-dashboard");
+        }
+      })
+      .catch((error) => {
+        console.error("Auth check error:", error);
+      });
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when starting the request
-    setError(""); // Reset error message
+    setLoading(true);
+    setError("");
 
-    // Check if username and password are empty
     if (!username.trim() || !password.trim()) {
       setError("Username and password are required");
       setLoading(false);
@@ -39,43 +46,33 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Important for cookies
         body: JSON.stringify(data),
       });
 
-      // Handle non-2xx responses
       if (!response.ok) {
         const errorData = await response.json();
         if (errorData.errors) {
-          // Handle validation errors
           setError(Object.values(errorData.errors).flat().join(", "));
         } else {
-          // Handle other errors
           setError(errorData || "Invalid username or password");
         }
         setLoading(false);
         return;
       }
 
-      const responseData = await response.json();
+      const userData = await response.json();
 
-      // If successful login, save tokens in localStorage and navigate to dashboard
-      if (responseData && responseData.accessToken) {
-        // Save tokens in localStorage
-        localStorage.setItem("accessToken", responseData.accessToken);
-        localStorage.setItem("refreshToken", responseData.refreshToken);
-
-        // Store user ID if it's included in the response or decoded from the token
-        const payload = JSON.parse(
-          atob(responseData.accessToken.split(".")[1])
-        );
-        if (payload.nameid) {
-          localStorage.setItem("userId", payload.nameid);
-        }
-
-        navigate("/user-dashboard");
-      } else {
-        setError("Login failed. Please try again.");
+      // We're using cookies now, but we can store non-sensitive user data
+      // like name and ID in localStorage for UI purposes
+      if (userData.userId) {
+        localStorage.setItem("userId", userData.userId);
       }
+      if (userData.username) {
+        localStorage.setItem("username", userData.username);
+      }
+
+      navigate("/user-dashboard");
     } catch (error) {
       console.error("Error:", error);
       setError("An unexpected error occurred. Please try again later.");

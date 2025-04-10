@@ -52,9 +52,6 @@ const ChatBot = () => {
         )}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
 
@@ -97,26 +94,13 @@ const ChatBot = () => {
 
   const handleLogout = async () => {
     try {
-      // Call the logout endpoint to invalidate the refresh token
-      const userId = localStorage.getItem("userId");
-      const refreshToken = localStorage.getItem("refreshToken");
-
-      if (userId && refreshToken) {
-        await authFetch("https://localhost:7289/logout", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            UserId: userId,
-            RefreshToken: refreshToken,
-          }),
-        });
-      }
+      await fetch("https://localhost:7289/logout", {
+        method: "POST",
+        credentials: "include",
+      });
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error("Logout error:", error);
     } finally {
-      // Clear local storage and navigate to login page
       localStorage.clear();
       navigate("/");
     }

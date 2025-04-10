@@ -6,69 +6,53 @@ import ChangePasswordForm from "../Comp/ChangePasswordForm";
 const UserDashboard = () => {
   // Establish basic state with correct field names
   const [user, setUser] = useState({
-    userId: "",
+    userId: localStorage.getItem("userId") || "",
+    username: localStorage.getItem("username") || "",
     email: "",
-    username: "",
   });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
-  // Use useEffect to load user data from token
+  // Fetch user data on component mount
   useEffect(() => {
-    try {
-      // Get token
-      const token = localStorage.getItem("accessToken");
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("https://localhost:7289/api/auth-test", {
+          credentials: "include",
+        });
 
-      // Check if token exists
-      if (!token) {
-        console.log("No token found");
+        if (!response.ok) {
+          // Not authenticated, redirect to login
+          navigate("/login");
+          return;
+        }
+
+        // Optionally fetch more user details if needed
+        // For now, we're just using what we saved during login
+        setLoading(false);
+      } catch (error) {
+        console.error("Auth check error:", error);
         navigate("/login");
-        return;
       }
+    };
 
-      // Split the token string correctly (JWT consists of 3 parts separated by dots)
-      const tokenParts = token.split(".");
-      // Check if token has the right format
-      if (tokenParts.length !== 3) {
-        console.log("Invalid token format");
-        return;
-      }
+    checkAuth();
+  }, [navigate]);
 
-      // Decode the payload part (second part) of the token
-      const decodedPart = atob(tokenParts[1]);
-
-      const tokenPayload = JSON.parse(decodedPart);
-
-      // Update user state with data from token
-      const updatedUser = {
-        userId:
-          tokenPayload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-          ] || "",
-        username:
-          tokenPayload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-          ] || "",
-        email:
-          tokenPayload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
-          ] || "",
-      };
-      localStorage.setItem(
-        "username",
-        tokenPayload[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-        ]
-      );
-      setUser(updatedUser);
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7289/logout", {
+        method: "POST",
+        credentials: "include",
+      });
     } catch (error) {
-      console.error(error); // Show full error details
+      console.error("Logout error:", error);
+    } finally {
+      // Clear local storage and navigate to login page
+      localStorage.clear();
+      navigate("/");
     }
-  }, []); // once it mounts
+  };
 
   return (
     <div className="dashboard-container">
