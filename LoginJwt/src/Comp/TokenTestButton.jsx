@@ -1,51 +1,37 @@
 import React, { useState } from "react";
-import { authFetch } from "../Utils/AuthUtils";
 
 const TokenTestButton = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(""); // "success" or "error"
 
-  const testAuthUtils = async () => {
-    setMessage("Testing token refresh with AuthUtils...");
+  const testTokenRefresh = async () => {
+    setMessage("Testing token refresh...");
     setStatus("");
     setLoading(true);
 
     try {
-      // Get current tokens for comparison
-      const oldAccessToken = localStorage.getItem("accessToken");
-      const oldRefreshToken = localStorage.getItem("refreshToken");
+      // Call refresh token endpoint directly
+      const response = await fetch("https://localhost:7289/refresh-token", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!oldAccessToken || !oldRefreshToken) {
-        setMessage("❌ Missing tokens in localStorage");
-        setStatus("error");
-        setLoading(false);
-        return;
-      }
-
-      // Get new tokens after request
-      const newAccessToken = localStorage.getItem("accessToken");
-      const newRefreshToken = localStorage.getItem("refreshToken");
+      console.log("Refresh response status:", response.status);
 
       if (response.ok) {
-        // Check if tokens were refreshed
-        if (
-          oldAccessToken !== newAccessToken ||
-          oldRefreshToken !== newRefreshToken
-        ) {
-          setMessage("✅ Request succeeded and tokens were refreshed!");
-          setStatus("success");
-        } else {
-          setMessage(
-            "✅ Request succeeded but tokens weren't refreshed (not expired yet)"
-          );
-          setStatus("success");
-        }
+        setMessage("✅ Token refresh successful!");
+        setStatus("success");
       } else {
+        const errorText = await response.text();
         setMessage(
-          `❌ Request failed: ${response.status} ${response.statusText}`
+          `❌ Token refresh failed: ${response.status} ${response.statusText}`
         );
         setStatus("error");
+        console.error("Refresh error details:", errorText);
       }
     } catch (error) {
       setMessage(`❌ Error: ${error.message}`);
@@ -59,7 +45,7 @@ const TokenTestButton = () => {
   return (
     <div className="token-test-container">
       <button
-        onClick={testAuthUtils}
+        onClick={testTokenRefresh}
         className="token-test-button"
         disabled={loading}
       >

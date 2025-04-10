@@ -45,7 +45,6 @@ const ChatBot = () => {
 
   const botResponse = async (userMessage) => {
     try {
-      // Add console logs to debug the issue
       console.log(
         "Sending request to:",
         `https://localhost:7289/InputMessage/${encodeURIComponent(userMessage)}`
@@ -57,6 +56,9 @@ const ChatBot = () => {
         )}`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 

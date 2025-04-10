@@ -1,14 +1,11 @@
 // src/Utils/AuthUtils.js
-// Remove isTokenExpired and refreshAccessToken functions since we won't have direct access to tokens
-
-// Create an authenticated fetch that works with cookies
 export const authFetch = async (url, options = {}) => {
   // Make sure credentials are included
   const authOptions = {
     ...options,
     credentials: "include", // This is crucial for cookies
     headers: {
-      ...options.headers,
+      ...(options.headers || {}),
       "Content-Type": "application/json",
     },
   };
@@ -27,17 +24,20 @@ export const authFetch = async (url, options = {}) => {
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 
       if (!refreshResponse.ok) {
         console.error("Failed to refresh token", await refreshResponse.text());
-        // Don't redirect immediately, just return the error response
+        // Return the original error response
         return response;
       }
 
       console.log("Token refreshed successfully, retrying original request");
-      // Retry the original request
+      // Retry the original request with the same options
       return fetch(url, authOptions);
     }
 
