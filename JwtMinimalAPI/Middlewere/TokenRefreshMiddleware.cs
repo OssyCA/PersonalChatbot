@@ -58,7 +58,7 @@ namespace JwtMinimalAPI.Middlewere
                                 {
                                     HttpOnly = true,
                                     Secure = true,
-                                    SameSite = SameSiteMode.Strict,
+                                    SameSite = SameSiteMode.None,
                                     Expires = DateTimeOffset.UtcNow.AddMinutes(15)
                                 });
 
@@ -67,7 +67,7 @@ namespace JwtMinimalAPI.Middlewere
                                 {
                                     HttpOnly = true,
                                     Secure = true,
-                                    SameSite = SameSiteMode.Strict,
+                                    SameSite = SameSiteMode.None,
                                     Expires = DateTimeOffset.UtcNow.AddDays(7)
                                 });
                             }
