@@ -10,7 +10,6 @@ const UserDashboard = () => {
     username: localStorage.getItem("username") || "",
     email: "",
   });
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const handleLogout = async () => {

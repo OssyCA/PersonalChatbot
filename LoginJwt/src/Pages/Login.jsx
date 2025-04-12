@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../Utils/AuthUtils";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -25,7 +26,7 @@ const Login = () => {
     };
 
     try {
-      const response = await fetch("https://localhost:7289/login", {
+      const response = await authFetch("https://localhost:7289/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +34,6 @@ const Login = () => {
         credentials: "include", // Important for cookies
         body: JSON.stringify(data),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         if (errorData.errors) {
