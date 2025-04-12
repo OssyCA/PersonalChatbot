@@ -29,8 +29,8 @@ const ChangePasswordForm = () => {
     setLoading(true);
 
     try {
-      const userId = localStorage.getItem("userId");
-
+      const username = localStorage.getItem("username");
+      console.log("Username from localStorage:", username);
       const response = await authFetch(
         "https://localhost:7289/change-password",
         {
@@ -39,7 +39,7 @@ const ChangePasswordForm = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            UserId: userId,
+            Username: username,
             OldPassword: oldPassword,
             NewPassword: newPassword,
           }),

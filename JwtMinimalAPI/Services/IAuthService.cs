@@ -9,9 +9,7 @@ namespace JwtMinimalAPI.Services
         Task<TokenResponseDto?> AuthenticateUserAsync(LoginDto request);
         Task<TokenResponseDto?> RefreshTokenPairAsync(RequestRefreshTokenDto request);
         Task<bool> RevokeRefreshTokenAsync(Guid userId, string refreshToken);
-        Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
         Task<User?> GetUserByUsernameAsync(string username);
-
         string CreateToken(User user);
         string GenerateRefreshToken();
     }

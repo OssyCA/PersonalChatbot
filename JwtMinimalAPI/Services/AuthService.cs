@@ -152,9 +152,5 @@ namespace JwtMinimalAPI.Services
         {
             return await context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
-        public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
-        {
-            return await context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-        }
     }
 }

@@ -2,6 +2,7 @@
 using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers;
 using JwtMinimalAPI.Helpers.EmailConfig;
+using JwtMinimalAPI.Middlewere;
 using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,7 @@ namespace JwtMinimalAPI.Endpoints
 {
     public class FrontendEndpoints()
     {
+      
         public static void HandleUser(WebApplication app)
         {
             app.MapPost("/register", async (UserDto request, IAuthService service, IMailService mailService) =>
@@ -165,7 +167,7 @@ namespace JwtMinimalAPI.Endpoints
         }
         public static void ChangePassword(WebApplication app)
         {
-            app.MapPut("change-password", async (ChangePasswordService change, ChangePasswordDto dto) =>
+            app.MapPost("change-password", async (ChangePasswordService change, ChangePasswordDto dto) =>
             {
                 var changedPassword = await change.ChangedPassword(dto);
 
