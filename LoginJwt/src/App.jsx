@@ -4,6 +4,7 @@ import StartScreen from "./Pages/StartScreen";
 import ChatBot from "./Pages/ChatBot";
 import ProtectedRoute from "./Comp/ProtectedRoute";
 import UserDashboard from "./Pages/UserDashboard";
+import AdminDashboard from "./Pages/AdminDashboard";
 import Navbar from "./Comp/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -18,6 +19,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/start-screen" element={<StartScreen />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             {/* Protected Routes*/}
             <Route element={<ProtectedRoute />}>
               <Route path="/chatbot" element={<ChatBot />} />

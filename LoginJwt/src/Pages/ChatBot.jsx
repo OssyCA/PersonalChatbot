@@ -45,11 +45,6 @@ const ChatBot = () => {
 
   const botResponse = async (userMessage) => {
     try {
-      console.log(
-        "Sending request to:",
-        `https://localhost:7289/InputMessage/${encodeURIComponent(userMessage)}`
-      );
-
       const response = await authFetch(
         `https://localhost:7289/InputMessage/${encodeURIComponent(
           userMessage
