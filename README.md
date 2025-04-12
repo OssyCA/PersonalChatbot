@@ -1,6 +1,6 @@
 # JWT Authentication With Cookie-Based Implementation
 
-## ⚠️ WORK IN PROGRESS ⚠️
+## ⚠️ WORK IN PROGRESS ⚠️ 
 
 This project is currently under active development and is not yet complete. Many features may be missing, incomplete, or contain bugs.
 
