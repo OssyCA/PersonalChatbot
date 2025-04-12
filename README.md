@@ -103,7 +103,7 @@ The project consists of two main parts:
    Create this file with the following structure (replace with your own values):
    ```json
    {
-     ""ChatBotApiKey": "GEMINI KEY",
+     "ChatBotApiKey": "GEMINI KEY",
      "Logging": {
        "LogLevel": {
          "Default": "Information",
