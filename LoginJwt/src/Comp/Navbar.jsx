@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+// NEED TO FIX TO UPDATE THE NAVBAR WHEN USER LOGS IN OR LOGS OUT
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
