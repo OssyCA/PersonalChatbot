@@ -25,14 +25,9 @@ namespace JwtMinimalAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             #region Services
-
             // Add services to the container.
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-            });
+            builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -84,7 +79,9 @@ namespace JwtMinimalAPI
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<ChatBotService>()
                 .AddScoped<IMailService, GmailSerivce>()
-                .AddScoped<ChangePasswordService>();
+                .AddScoped<ChangePasswordService>()
+                .AddScoped<IAdminService, AdminService>();
+                        
 
             builder.Services.AddRateLimiter(options => 
             {
@@ -126,6 +123,7 @@ namespace JwtMinimalAPI
             FrontendEndpoints.HandleUser(app);
             FrontendEndpoints.HandleChatBot(app);
             FrontendEndpoints.ChangePassword(app);
+            FrontendEndpoints.AdminManage(app);
 
             app.Run();
         }

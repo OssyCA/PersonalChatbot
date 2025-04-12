@@ -15,7 +15,6 @@ namespace JwtMinimalAPI.Endpoints
 {
     public class FrontendEndpoints()
     {
-      
         public static void HandleUser(WebApplication app)
         {
             app.MapPost("/register", async (UserDto request, IAuthService service, IMailService mailService) =>
@@ -85,13 +84,15 @@ namespace JwtMinimalAPI.Endpoints
                     Expires = DateTimeOffset.UtcNow.AddDays(7)
                 });
 
-                // Return user info (excluding password)
+                //Return user info(excluding password)
                 return Results.Ok(new
                 {
                     userId = user.UserId.ToString(),
                     username = user.UserName,
                     email = user.Email
                 });
+
+                //return Results.Ok(tokenResponse); // use to return the token response in scalar api test
             });
 
 
@@ -180,6 +181,22 @@ namespace JwtMinimalAPI.Endpoints
                     return Results.BadRequest();
                 }
             });
+        }
+
+        public static void AdminManage(WebApplication app)
+        {
+            app.MapGet("api/GetUsers", async (IAdminService service) =>
+            {
+                var user = await service.GetUsers();
+
+                if (user is not null)
+                {
+                    return Results.Ok(user);
+                }
+                return Results.NotFound("No users");
+
+
+            }).RequireAuthorization("AdminPolicy");
         }
     }
 }
