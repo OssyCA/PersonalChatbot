@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { authFetch } from "../Utils/AuthUtils"; // Import the authFetch utility
+import { authFetch } from "../Utils/AuthUtils";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -143,10 +143,10 @@ const ChatBot = () => {
       <div className="chat-header">
         <h1>ChatBot</h1>
         <div className="header-buttons">
-          <button onClick={handleBackToDashboard} className="back-button">
+          <button onClick={handleBackToDashboard} className="btn btn-sm">
             Dashboard
           </button>
-          <button onClick={handleLogout} className="logout-button">
+          <button onClick={handleLogout} className="btn btn-sm btn-danger">
             Sign out
           </button>
         </div>
@@ -188,7 +188,11 @@ const ChatBot = () => {
           disabled={isLoading}
           rows={1}
         />
-        <button onClick={sendMessage} disabled={isLoading || !input.trim()}>
+        <button
+          onClick={sendMessage}
+          disabled={isLoading || !input.trim()}
+          className="btn btn-primary"
+        >
           Send
         </button>
       </div>

@@ -1,28 +1,79 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
-
-import React from "react";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const username = localStorage.getItem("username");
+    setIsLoggedIn(!!username);
+  }, []);
+
   return (
     <header>
       <nav>
-        <ul>
-          <li>
-            <NavLink to="/">Home</NavLink>
+        <ul className="nav-list">
+          <li className="nav-item">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              Home
+            </NavLink>
           </li>
-          <li>
-            <NavLink to="/login">Login</NavLink>
-          </li>
-          <li>
-            <NavLink to="/register">Register</NavLink>
-          </li>
-          <li>
-            <NavLink to="/chatbot">ChatBot</NavLink>
-          </li>
-          <li>
-            <NavLink to="/user-dashboard">User Dashboard</NavLink>
-          </li>
+
+          {!isLoggedIn && (
+            <>
+              <li className="nav-item">
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  Login
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/register"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  Register
+                </NavLink>
+              </li>
+            </>
+          )}
+
+          {isLoggedIn && (
+            <>
+              <li className="nav-item">
+                <NavLink
+                  to="/chatbot"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  ChatBot
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/user-dashboard"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>

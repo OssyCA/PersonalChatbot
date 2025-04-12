@@ -7,16 +7,20 @@ const StartScreen = () => {
   return (
     <div className="start-screen">
       <h1>Welcome to ChatBot Application</h1>
-      <div className="buttons">
-        <button className="startBtn" onClick={() => navigate("/Login")}>
-          Login
+      <p>Your intelligent AI assistant for seamless conversations</p>
+
+      <div className="btn-group">
+        <button
+          className="btn btn-primary btn-lg"
+          onClick={() => navigate("/login")}
+        >
+          Sign In
         </button>
         <button
-          className="startBtn"
-          style={{ backgroundColor: "#4a5568" }}
+          className="btn btn-outline btn-lg"
           onClick={() => navigate("/register")}
         >
-          Register
+          Create Account
         </button>
       </div>
     </div>

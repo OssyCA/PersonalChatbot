@@ -68,33 +68,45 @@ const Login = () => {
   return (
     <div className="form-box">
       <form className="form" onSubmit={handleSubmit}>
-        <span className="title">Sign in</span>
-        <span className="subtitle">Access your account</span>
+        <h1 className="form-title">Sign in</h1>
+        <p className="form-subtitle">Access your account</p>
 
         {error && <div className="error-message">{error}</div>}
 
-        <div className="form-container">
+        <div className="form-group">
           <input
             type="text"
-            className="input"
+            className="form-input"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={loading}
           />
+        </div>
+
+        <div className="form-group">
           <input
             type="password"
-            className="input"
+            className="form-input"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? (
+            <>
+              <span className="spinner"></span>
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
+
       <div className="form-section">
         <p>
           <a href="#">Forgot password?</a>

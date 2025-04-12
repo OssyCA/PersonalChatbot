@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../Utils/AuthUtils";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -10,14 +11,6 @@ const Register = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Check if already logged in
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      navigate("/user-dashboard");
-    }
-  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +51,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch("https://localhost:7289/register", {
+      const response = await authFetch("https://localhost:7289/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,50 +88,68 @@ const Register = () => {
   return (
     <div className="form-box">
       <form className="form" onSubmit={handleSubmit}>
-        <span className="title">Sign up</span>
-        <span className="subtitle">Create a free account with your email</span>
+        <h1 className="form-title">Sign up</h1>
+        <p className="form-subtitle">Create a free account with your email</p>
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <div className="form-container">
+        <div className="form-group">
           <input
             type="text"
-            className="input"
+            className="form-input"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={loading}
           />
+        </div>
+
+        <div className="form-group">
           <input
             type="email"
-            className="input"
+            className="form-input"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
           />
+        </div>
+
+        <div className="form-group">
           <input
             type="password"
-            className="input"
+            className="form-input"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
           />
+        </div>
+
+        <div className="form-group">
           <input
             type="password"
-            className="input"
+            className="form-input"
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             disabled={loading}
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing up..." : "Sign up"}
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? (
+            <>
+              <span className="spinner"></span>
+              Signing up...
+            </>
+          ) : (
+            "Sign up"
+          )}
         </button>
       </form>
+
       <div className="form-section">
         <p>
           <a href="/login">Already have an account?</a>

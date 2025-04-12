@@ -1,4 +1,3 @@
-// src/Comp/TokenTestButton.jsx
 import React, { useState } from "react";
 import { authFetch } from "../Utils/AuthUtils";
 
@@ -91,45 +90,49 @@ const TokenTestButton = () => {
         <button
           onClick={testPublicEndpoint}
           disabled={loading}
-          className="token-test-button"
+          className="btn btn-secondary btn-sm"
         >
           Test Public API
         </button>
         <button
           onClick={testAuthEndpoint}
           disabled={loading}
-          className="token-test-button"
+          className="btn btn-secondary btn-sm"
         >
           Test Auth API
         </button>
         <button
           onClick={testRefreshToken}
           disabled={loading}
-          className="token-test-button"
+          className="btn btn-secondary btn-sm"
         >
           Test Token Refresh
         </button>
         <button
           onClick={checkCookies}
           disabled={loading}
-          className="token-test-button"
+          className="btn btn-secondary btn-sm"
         >
           Check Cookies
         </button>
-        <button onClick={clearMessages} className="token-test-button">
+        <button onClick={clearMessages} className="btn btn-outline btn-sm">
           Clear Log
         </button>
       </div>
 
       <div className="test-log">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`log-entry ${msg.isError ? "error" : "success"}`}
-          >
-            <span className="log-time">[{msg.time}]</span> {msg.text}
-          </div>
-        ))}
+        {messages.length === 0 ? (
+          <div className="log-entry">No log entries yet</div>
+        ) : (
+          messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`log-entry ${msg.isError ? "error" : "success"}`}
+            >
+              <span className="log-time">[{msg.time}]</span> {msg.text}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

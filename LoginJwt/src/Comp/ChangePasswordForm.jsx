@@ -69,8 +69,8 @@ const ChangePasswordForm = () => {
   };
 
   return (
-    <div className="changePasswordContainer">
-      <h1>Change Password</h1>
+    <div className="change-password-container">
+      <h2>Change Password</h2>
 
       {message.text && (
         <div className={message.isError ? "error-message" : "success-message"}>
@@ -79,32 +79,48 @@ const ChangePasswordForm = () => {
       )}
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="password"
-          placeholder="Current Password"
-          className="input"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="New Password"
-          className="input"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="Confirm New Password"
-          className="input"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          disabled={loading}
-        />
-        <button className="changeBtn" type="submit" disabled={loading}>
-          {loading ? "Changing..." : "Change Password"}
+        <div className="form-group">
+          <input
+            type="password"
+            className="form-input"
+            placeholder="Current Password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="password"
+            className="form-input"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="password"
+            className="form-input"
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+
+        <button className="btn btn-primary" type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <span className="spinner"></span>
+              Changing...
+            </>
+          ) : (
+            "Change Password"
+          )}
         </button>
       </form>
     </div>
