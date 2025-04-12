@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TokenTestButton from "../Comp/TokenTestButton";
 import ChangePasswordForm from "../Comp/ChangePasswordForm";
+import LogoutButton from "../Comp/LogoutButton";
 
 const UserDashboard = () => {
   // Establish basic state with correct field names
@@ -12,28 +13,11 @@ const UserDashboard = () => {
   });
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await fetch("https://localhost:7289/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      // Clear local storage and navigate to login page
-      localStorage.clear();
-      navigate("/");
-    }
-  };
-
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>User Dashboard</h1>
-        <button className="btn btn-danger" onClick={handleLogout}>
-          Sign Out
-        </button>
+        <LogoutButton />
       </div>
 
       <div className="user-info">

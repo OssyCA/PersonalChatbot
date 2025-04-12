@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../Utils/AuthUtils";
+import LogoutButton from "../Comp/LogoutButton";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -115,20 +116,6 @@ const ChatBot = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("https://localhost:7289/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.clear();
-      navigate("/");
-    }
-  };
-
   const handleBackToDashboard = () => {
     navigate("/user-dashboard");
   };
@@ -141,9 +128,7 @@ const ChatBot = () => {
           <button onClick={handleBackToDashboard} className="btn btn-sm">
             Dashboard
           </button>
-          <button onClick={handleLogout} className="btn btn-sm btn-danger">
-            Sign out
-          </button>
+          <LogoutButton />
         </div>
       </div>
 
