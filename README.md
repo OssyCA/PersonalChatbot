@@ -1,128 +1,126 @@
-JWT Authentication Project
-⚠️ Learning Project ⚠️
 
-This project was created as a learning exercise to explore different approaches to JWT authentication in a full-stack application. It is not intended for production use without additional security considerations and improvements. The main goal was to understand the mechanics of JWT authentication, refresh tokens, and different storage strategies.
-Overview
-This project demonstrates a full-stack implementation of JWT (JSON Web Token) authentication with a .NET Minimal API backend and a React frontend. It includes token-based authentication with refresh tokens, user registration, login, and a protected chatbot application.
-Branch-Specific Implementations
-This repository contains multiple branches that showcase different approaches to JWT token storage:
+# 🔐 AJWT Authentication Project
 
-Main Branch: Uses localStorage for token storage (simple but less secure)
-Cookie-Branch: Implements HTTP-only cookies for token storage (more secure against XSS attacks)
+⚠️ **Learning Project – Not for Production Use** ⚠️  
+This project was created as a learning exercise to explore different approaches to JWT authentication in a full-stack environment. It is **not intended for production** without further security considerations and improvements.
 
-Both implementations have their pros and cons:
-LocalStorage Approach (Main Branch)
+---
 
-Pros: Simple to implement, works across all browsers, easy to access tokens on client
-Cons: Vulnerable to XSS attacks as JavaScript can access the tokens
+## 📌 Overview
 
-HttpOnly Cookies Approach (Cookie-Branch)
+This full-stack project demonstrates **JWT (JSON Web Token) authentication** using:
 
-Pros: More secure against XSS attacks as JavaScript cannot access HttpOnly cookies
-Cons: More complex to implement, potential CSRF vulnerabilities (requires additional mitigation)
+- **.NET Minimal API (Backend)**
+- **React with Vite (Frontend)**
 
-Project Structure
-The project consists of two main parts:
-Backend (.NET Minimal API)
+It covers:
+- User registration, login, and logout
+- Token-based authentication with refresh tokens
+- Protected chatbot interface using Google Gemini API
+- Rate limiting and password hashing
+- Two different JWT storage strategies across branches
 
-Located in the JwtMinimalAPI directory
-Built with .NET 9.0
-Implements JWT token authentication with refresh token mechanism
-Features automatic token refresh middleware
-Includes user registration and login endpoints
-Provides password change functionality
-Integrates a chatbot API endpoint that connects to the Gemini API
-Implements email notification functionality for user registration
-Protects routes using JWT authorization
-Includes rate limiting for login attempts
+---
 
-Frontend (React)
+## 🌱 Branch-Specific Implementations
 
-Located in the LoginJwt directory
-Built with React 19 and Vite
-Includes login, registration, user dashboard, and chatbot pages
-Implements client-side token refresh mechanism
-Features protected routes using React Router
-Includes password change functionality
-Provides token testing functionality
+| Branch        | Token Storage | Description |
+|---------------|----------------|-------------|
+| `main`        | `localStorage` | Simple to implement, vulnerable to XSS |
+| `Cookie-Branch` | `HttpOnly Cookies` | More secure against XSS, but requires CSRF protection |
 
-Features
+### 📊 Pros & Cons
 
-Authentication Flow:
+**LocalStorage (Main Branch)**
+- ✅ Simple to implement
+- ✅ Works across all browsers
+- ❌ Vulnerable to XSS
 
-User registration with email notification
-User authentication with JWT tokens
-Automatic token refresh mechanism
-Protected API endpoints and frontend routes
-Logout functionality that invalidates refresh tokens
+**HttpOnly Cookies (Cookie-Branch)**
+- ✅ Secure against XSS
+- ❌ Requires CSRF protection
+- ❌ Slightly more complex to implement
 
+---
 
-User Management:
+## 🗂️ Project Structure
 
-Registration with email and username
-Password change functionality
-Display of user information in dashboard
+### Backend (.NET 9.0 – `JwtMinimalAPI`)
+- JWT token + refresh token handling
+- User registration, login, password change
+- Gemini API integration for chatbot
+- Email notifications (SMTP support)
+- Rate limiting + exception handling
 
+### Frontend (React 19 – `LoginJwt`)
+- Login, registration, dashboard, and chatbot
+- Token handling (localStorage or cookies depending on branch)
+- Protected routes with React Router v7
 
-Chatbot Integration:
+---
 
-Integration with Google's Gemini API (requires an API key)
-Protected chat interface
-Real-time messaging
+## 🚀 Features
 
+### ✅ Authentication Flow
+- User registration with email notification
+- JWT-based login and protected API access
+- Automatic token refresh
+- Logout with refresh token invalidation
 
-Security Features:
+### 👥 User Management
+- Registration (username, email, password)
+- Password change
+- Dashboard with user info
 
-Password hashing
-Token-based authentication
-Refresh token rotation
-Rate limiting on login attempts
-Global exception handling
+### 🤖 Chatbot Integration
+- Google Gemini API (API key required)
+- Protected chat interface
+- Real-time messaging
 
+### 🔐 Security
+- Password hashing
+- JWT token handling
+- Refresh token rotation
+- Rate limiting for login
+- Global exception middleware
 
+---
 
-Technology Stack
-Backend:
+## 🛠️ Tech Stack
 
-.NET 9.0
-Entity Framework Core
-SQL Server
-JWT Authentication
-Minimal API architecture
-Rate limiting
-Global exception middleware
+### Backend
+- .NET 9.0
+- Entity Framework Core
+- SQL Server
+- JWT Authentication
+- Minimal API architecture
 
-Frontend:
+### Frontend
+- React 19
+- Vite
+- React Router v7
+- Pure CSS (no UI libraries)
 
-React 19
-Vite
-React Router v7
-Pure CSS (no external UI libraries)
-Custom authentication utilities
+---
 
-Getting Started
-Prerequisites
+## 🧰 Getting Started
 
-.NET 9.0 SDK
-Node.js (v18+)
-SQL Server (for the backend database)
-A Gemini API key for the chatbot functionality
-SMTP credentials for email notifications (Gmail setup included)
+### ✅ Prerequisites
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/)
+- [Node.js v18+](https://nodejs.org/)
+- SQL Server
+- Gemini API Key
+- SMTP credentials (Gmail supported)
 
-Backend Setup
+---
 
-Navigate to the JwtMinimalAPI directory
-Create or update the following configuration files:
-appsettings.json
-Create this file with the following structure (replace with your own values):
-json{
+## ⚙️ Backend Setup
+
+1. Navigate to the `JwtMinimalAPI` directory.
+2. Create or update `appsettings.json`:
+```json
+{
   "ChatBotApiKey": "GEMINI KEY",
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
   "ConnectionStrings": {
     "UserDatabase": "Data Source=YOUR_SERVER;Database=YOUR_DATABASE;Integrated Security=True;Encrypt=True;Trust Server Certificate=True;"
   },
@@ -138,97 +136,101 @@ json{
     "Password": "your-app-password"
   }
 }
+```
 
-Set up User Secrets for the ChatBot API key (the ChatBot will not function without this):
+3. Set up User Secrets:
+```bash
 dotnet user-secrets set "ChatBotApiKey" "YOUR_GEMINI_API_KEY"
+```
 
-Apply the database migrations to create the database:
+4. Apply database migrations:
+```bash
 dotnet ef database update
+```
 
-Start the API:
+5. Start the API:
+```bash
 dotnet run
+```
 
+---
 
-Frontend Setup
+## ⚛️ Frontend Setup
 
-Navigate to the LoginJwt directory
-Install dependencies:
+1. Navigate to the `LoginJwt` directory.
+2. Install dependencies:
+```bash
 npm install
-
-Start the development server:
+```
+3. Start the dev server:
+```bash
 npm run dev
+```
 
+---
 
-Implementation Details
-JWT Authentication Flow
-The authentication flow works as follows:
+## 🔄 JWT Flow (High-Level)
 
-Registration: User registers with username, email, and password
-Login: User logs in and receives an access token and refresh token
-Token Storage:
+1. **Register** → Email + username + hashed password
+2. **Login** → Receives access + refresh token
+3. **Token Storage**
+   - `main`: localStorage
+   - `cookie-branch`: HttpOnly cookie
+4. **Authenticated API calls**
+   - `main`: Authorization header
+   - `cookie-branch`: Automatic via browser
+5. **Token Refresh**
+   - Manual (main)
+   - Middleware-based (cookie-branch)
+6. **Logout** → Refresh token invalidation
 
-Main branch: Tokens are stored in localStorage
-Cookie branch: Tokens are stored in HTTP-only cookies
+---
 
+## 🛡️ Password Security
 
-API Requests: Access token is sent with each request to protected endpoints
+- ASP.NET Core’s `PasswordHasher`
+- Strong password enforcement
+- Hashed passwords stored in DB
 
-Main branch: Token sent via Authorization header
-Cookie branch: Token sent automatically via cookies
+---
 
+## 📚 Learning Outcomes
 
-Token Refresh: When access token expires, the system automatically refreshes it using the refresh token
-Logout: On logout, the refresh token is invalidated on the server
+- JWT authentication flow
+- Token storage strategies (localStorage vs cookies)
+- Secure refresh token handling
+- Rate limiting & exception handling
+- Secure password validation
+- Protected routes in React
+- Middleware-based token refresh
 
-Token Refresh Mechanism
+---
 
-Server-side middleware intercepts requests with expiring tokens and refreshes them automatically
-Client-side utility (main branch: authFetch) handles token refresh when making API calls
-Token refresh strategies differ between branches:
+## ⚠️ Important Notes
 
-Main branch: Manual refresh using refresh token endpoint
-Cookie branch: Automatic refresh via middleware
+- Never commit secrets, API keys, or connection strings
+- Use **User Secrets** during development
+- Use **Environment Variables** in production
+- Gmail SMTP with 2FA requires an **App Password**
+- Use **HTTPS** in production environments
 
+---
 
+## 🌟 Future Enhancements
 
-Password Security
+- User role management
+- Password reset functionality
+- Social login (Google, GitHub, etc.)
+- Enhanced chatbot features
+- Admin dashboard
+- Unit & integration tests
+- Logging & monitoring
+- CSRF protection (cookie-branch)
 
-Passwords are hashed using ASP.NET Core's PasswordHasher
-Password validation ensures strong passwords with special characters, numbers, uppercase letters, etc.
+---
 
-Learning Outcomes
-This project was created to learn and understand:
+## 📬 Contact
 
-JWT authentication flow and implementation details
-The pros and cons of different token storage strategies
-Handling refresh tokens securely
-Building a secure authentication system with .NET Minimal API
-Creating protected routes in React
-Implementing middleware for token refresh
-Rate limiting to prevent brute force attacks
-Best practices for password handling and validation
+Feel free to fork, clone, or contribute to the project. This is a learning-focused repository, so improvements are always welcome!
 
-Important Notes
-
-API Keys Required: The chatbot functionality will not work without a valid Google Gemini API key. You can obtain one from the Google AI Studio.
-Security Considerations:
-
-Never commit real API keys, database connection strings, JWT secrets, or email credentials to your repository
-The project uses .NET User Secrets for development and should use environment variables or a secure configuration system in production
-Gmail SMTP requires an "App Password" if you have 2FA enabled - never use your regular Gmail password
-In a production environment, use more robust secret management and consider HTTPS for all communications
-
-
-
-Future Enhancements
-
-Add user role management
-Implement password reset functionality
-Add social login options
-Enhance chatbot capabilities
-Add admin dashboard
-Implement user profile management
-Add comprehensive logging and monitoring
-Implement unit and integration tests
-Explore other token storage mechanisms (e.g., Web Storage API, IndexedDB)
-Implement CSRF protection for cookie-based authentication
+---
