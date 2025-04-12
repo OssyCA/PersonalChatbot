@@ -106,11 +106,10 @@ namespace JwtMinimalAPI.Endpoints
             // endpoint to refresh the token
             // Update refresh token endpoint
             // In FrontendEndpoints.cs
-            // In FrontendEndpoints.cs
             app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service, MiniJwtDbContext dbContext) =>
             {
                 // Check if refresh token exists in cookies
-                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out string refreshToken))
+                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out string? refreshToken))
                 {
                     return Results.Unauthorized();
                 }
@@ -155,18 +154,6 @@ namespace JwtMinimalAPI.Endpoints
            .WithName("AuthTest");
             // In FrontendEndpoints.cs
             app.MapGet("/api/public-test", () => Results.Ok(new { message = "This is a public endpoint" }));
-        }
-        private static dynamic GetUserInfoFromToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            return new
-            {
-                UserId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
-                Username = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
-                Email = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value
-            };
         }
         public static void HandleChatBot(WebApplication app)
         {

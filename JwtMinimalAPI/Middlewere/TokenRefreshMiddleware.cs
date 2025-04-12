@@ -21,16 +21,31 @@ namespace JwtMinimalAPI.Middlewere
             _logger = logger;
             _configuration = configuration;
         }
-        // NEED FIX FOR COOKIES
-        // In TokenRefreshMiddleware.cs
+
         public async Task InvokeAsync(HttpContext context)
         {
+            _logger.LogWarning("Processing request in TokenRefreshMiddleware");
+
             // Only try to refresh if we have both cookies
-            if (context.Request.Cookies.TryGetValue("accessToken", out string token) &&
-                context.Request.Cookies.TryGetValue("refreshToken", out string refreshToken))
+            if (context.Request.Cookies.TryGetValue("accessToken", out string? token) &&
+                context.Request.Cookies.TryGetValue("refreshToken", out string? refreshToken))
             {
+                _logger.LogDebug("Found both access and refresh tokens in cookies");
+
                 // Only refresh if token is actually near expiration or invalid
-                if (!IsTokenValid(token) || IsTokenNearExpiration(token))
+                bool isValid = IsTokenValid(token);
+                bool isNearExpiration = IsTokenNearExpiration(token);
+
+                if (!isValid)
+                {
+                    _logger.LogInformation("Access token is invalid, attempting refresh");
+                }
+                else if (isNearExpiration)
+                {
+                    _logger.LogInformation("Access token is near expiration, attempting refresh");
+                }
+
+                if (!isValid || isNearExpiration)
                 {
                     var authService = context.RequestServices.GetRequiredService<IAuthService>();
 
@@ -43,16 +58,21 @@ namespace JwtMinimalAPI.Middlewere
 
                         if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out Guid userId))
                         {
+                            _logger.LogDebug("Successfully extracted user ID {UserId} from token", userId);
+
                             var refreshRequest = new RequestRefreshTokenDto
                             {
                                 UserId = userId,
                                 RefreshToken = refreshToken
                             };
 
+                            _logger.LogDebug("Attempting to refresh token for user {UserId}", userId);
                             var tokenResponse = await authService.RefreshTokenPairAsync(refreshRequest);
 
                             if (tokenResponse != null)
                             {
+                                _logger.LogInformation("Successfully refreshed tokens for user {UserId}", userId);
+
                                 // Set new access token cookie
                                 context.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
                                 {
@@ -71,18 +91,41 @@ namespace JwtMinimalAPI.Middlewere
                                     Expires = DateTimeOffset.UtcNow.AddDays(7)
                                 });
                             }
+                            else
+                            {
+                                _logger.LogWarning("Token refresh returned null for user {UserId}", userId);
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Failed to extract valid user ID from token");
                         }
                     }
-                    catch
+                    catch (SecurityTokenException tokenEx)
                     {
-                        // Silently fail - we'll continue to the endpoint which will
-                        // return 401 if token is truly invalid
+                        _logger.LogWarning("Token security validation failed during refresh: {Message}", tokenEx.Message);
+                    }
+                    catch (InvalidOperationException opEx)
+                    {
+                        _logger.LogWarning("Invalid operation during token refresh: {Message}", opEx.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Unexpected error during token refresh attempt");
+                        // Optionally clear cookies on critical errors but better safty
+                        context.Response.Cookies.Delete("accessToken");
+                        context.Response.Cookies.Delete("refreshToken");
                     }
                 }
+            }
+            else
+            {
+                _logger.LogDebug("One or both tokens missing from cookies - skipping refresh");
             }
 
             await _next(context);
         }
+
         private bool IsTokenValid(string token)
         {
             try
@@ -105,11 +148,13 @@ namespace JwtMinimalAPI.Middlewere
                 tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogDebug("Token validation failed: {Message}", ex.Message);
                 return false;
             }
         }
+
         private bool IsTokenNearExpiration(string token)
         {
             try
@@ -118,40 +163,28 @@ namespace JwtMinimalAPI.Middlewere
                 var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
                 if (jwtToken == null)
-                    return true;
-
-                // Check if token expires in less than set time
-                return jwtToken.ValidTo.ToUniversalTime() < DateTime.UtcNow.AddMinutes(5);
-            }
-            catch
-            {
-                // If there's an error reading the token, consider it expired
-                return true;
-            }
-        }
-
-        private Guid GetUserIdFromToken(string token)
-        {
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-
-                if (jwtToken == null)
-                    return Guid.Empty;
-
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-                if (userIdClaim != null && Guid.TryParse(userIdClaim, out Guid userId))
                 {
-                    return userId;
+                    _logger.LogDebug("Could not parse token as JwtSecurityToken");
+                    return true;
                 }
 
-                return Guid.Empty;
+                // Check if token expires in less than set time
+                var expirationTime = jwtToken.ValidTo.ToUniversalTime();
+                var timeUntilExpiration = expirationTime - DateTime.UtcNow;
+                var isNearExpiration = expirationTime < DateTime.UtcNow.AddMinutes(5);
+
+                if (isNearExpiration)
+                {
+                    _logger.LogDebug("Token expires in {MinutesRemaining} minutes", timeUntilExpiration.TotalMinutes);
+                }
+
+                return isNearExpiration;
             }
-            catch
+            catch (Exception ex)
             {
-                return Guid.Empty;
+                _logger.LogWarning("Error checking token expiration: {Message}", ex.Message);
+                // If there's an error reading the token, consider it expired
+                return true;
             }
         }
     }

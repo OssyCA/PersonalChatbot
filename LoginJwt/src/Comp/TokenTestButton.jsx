@@ -81,8 +81,6 @@ const TokenTestButton = () => {
 
   const checkCookies = () => {
     addMessage("Checking cookies (see console)");
-    console.log("Document cookies:", document.cookie);
-    // Note: HttpOnly cookies won't show in document.cookie
   };
 
   return (
