@@ -60,7 +60,7 @@ namespace JwtMinimalAPI
                         Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Appsettings:Token")!)),
                     ValidateIssuerSigningKey = true
                 };
-                options.Events = new JwtBearerEvents
+                options.Events = new JwtBearerEvents // this override to look for tookens in cookies
                 {
                     OnMessageReceived = context =>
                     {

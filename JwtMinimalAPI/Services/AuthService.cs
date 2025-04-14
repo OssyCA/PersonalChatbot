@@ -143,7 +143,7 @@ namespace JwtMinimalAPI.Services
 
             // Invalidate the refresh token
             user.RefreshToken = null;
-            user.RefreshTokenExpireTime = DateTime.UtcNow.AddMinutes(1); // To invalidate the token
+            user.RefreshTokenExpireTime = DateTime.UtcNow.AddMinutes(-1); // To invalidate the token
             await context.SaveChangesAsync();
 
             return true;
