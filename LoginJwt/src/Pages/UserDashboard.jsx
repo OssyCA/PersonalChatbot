@@ -9,7 +9,7 @@ const UserDashboard = () => {
   const [user, setUser] = useState({
     userId: localStorage.getItem("userId") || "",
     username: localStorage.getItem("username") || "",
-    email: "",
+    email: localStorage.getItem("email") || "",
   });
   const navigate = useNavigate();
 
@@ -30,8 +30,7 @@ const UserDashboard = () => {
             Username: <span className="info-value">{user.username}</span>
           </p>
           <p className="info-label">
-            Email:{" "}
-            <span className="info-value">{user.email || "Not available"}</span>
+            Email: <span className="info-value">{user.email}</span>
           </p>
         </div>
       </div>

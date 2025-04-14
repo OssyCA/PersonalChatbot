@@ -55,6 +55,9 @@ const Login = () => {
       if (userData.username) {
         localStorage.setItem("username", userData.username);
       }
+      if (userData.email) {
+        localStorage.setItem("email", userData.email);
+      }
 
       navigate("/user-dashboard");
     } catch (error) {
