@@ -68,21 +68,9 @@ namespace JwtMinimalAPI.Endpoints
                 }
 
                 // Set cookies
-                httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
-                });
+                httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, GetCookieOptionsData.AccessTokenCookie());
 
-                httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
+                httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, GetCookieOptionsData.RefreshTokenCookie());
 
                 //Return user info(excluding password)
                 return Results.Ok(new
@@ -134,21 +122,9 @@ namespace JwtMinimalAPI.Endpoints
                 await dbContext.SaveChangesAsync();
 
                 // Set cookies
-                httpContext.Response.Cookies.Append("accessToken", accessToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // For HTTPS
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddMinutes(15)
-                });
+                httpContext.Response.Cookies.Append("accessToken", accessToken, GetCookieOptionsData.AccessTokenCookie());
 
-                httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // For HTTPS
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(7)
-                });
+                httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, GetCookieOptionsData.RefreshTokenCookie());
 
                 return Results.Ok(new { success = true });
             }).AllowAnonymous(); // Important - make sure this endpoint is accessible without authentication

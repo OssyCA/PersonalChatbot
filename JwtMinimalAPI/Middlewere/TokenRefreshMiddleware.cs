@@ -74,22 +74,10 @@ namespace JwtMinimalAPI.Middlewere
                                 _logger.LogInformation("Successfully refreshed tokens for user {UserId}", userId);
 
                                 // Set new access token cookie
-                                context.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, new CookieOptions
-                                {
-                                    HttpOnly = true,
-                                    Secure = true,
-                                    SameSite = SameSiteMode.None,
-                                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
-                                });
+                                context.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, GetCookieOptionsData.AccessTokenCookie());
 
                                 // Set new refresh token cookie
-                                context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, new CookieOptions
-                                {
-                                    HttpOnly = true,
-                                    Secure = true,
-                                    SameSite = SameSiteMode.None,
-                                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                                });
+                                context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, GetCookieOptionsData.RefreshTokenCookie());
                             }
                             else
                             {
