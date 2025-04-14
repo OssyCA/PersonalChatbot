@@ -88,8 +88,8 @@ namespace JwtMinimalAPI.Endpoints
             app.MapPost("/logout", (HttpContext httpContext) =>
             {
                 // Clear cookies
-                httpContext.Response.Cookies.Delete("accessToken");
-                httpContext.Response.Cookies.Delete("refreshToken");
+                httpContext.Response.Cookies.Delete("accessToken", GetCookieOptionsData.AccessTokenCookie());
+                httpContext.Response.Cookies.Delete("refreshToken", GetCookieOptionsData.RefreshTokenCookie());
 
                 return Results.Ok("Logged out successfully");
             });
