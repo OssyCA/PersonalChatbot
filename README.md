@@ -1,5 +1,5 @@
 
-# 🔐 AJWT Authentication Project
+# 🔐 JWT Authentication Project 
 
 ⚠️ **Learning Project – Not for Production Use** ⚠️  
 This project was created as a learning exercise to explore different approaches to JWT authentication in a full-stack environment. It is **not intended for production** without further security considerations and improvements.
