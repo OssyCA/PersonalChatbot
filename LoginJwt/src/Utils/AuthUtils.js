@@ -13,28 +13,29 @@ export const authFetch = async (url, options = {}) => {
     // First attempt
     let response = await fetch(url, authOptions);
 
-    // If unauthorized, try refresh once
-    if (response.status === 401) {
-      console.log("Unauthorized, attempting token refresh...");
+    // NOT NEEDED WITH MIDDLEWERE
+    // // If unauthorized, try refresh once
+    // if (response.status === 401) {
+    //   console.log("Unauthorized, attempting token refresh...");
 
-      const refreshResponse = await fetch(
-        "https://localhost:7289/refresh-token",
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+    //   const refreshResponse = await fetch(
+    //     "https://localhost:7289/refresh-token",
+    //     {
+    //       method: "POST",
+    //       credentials: "include",
+    //     }
+    //   );
 
-      if (refreshResponse.ok) {
-        console.log("Token refreshed, retrying original request");
-        // Retry original request
-        return fetch(url, authOptions);
-      } else {
-        console.log("Refresh failed, returning 401");
-        // If refresh failed, we're truly unauthorized
-        return response;
-      }
-    }
+    //   if (refreshResponse.ok) {
+    //     console.log("Token refreshed, retrying original request");
+    //     // Retry original request
+    //     return fetch(url, authOptions);
+    //   } else {
+    //     console.log("Refresh failed, returning 401");
+    //     // If refresh failed, we're truly unauthorized
+    //     return response;
+    //   }
+    // }
 
     return response;
   } catch (error) {
