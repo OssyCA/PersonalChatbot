@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.CookiePolicy;
 
-namespace JwtMinimalAPI.Services
+namespace JwtMinimalAPI.Helpers
 {
     public class GetCookieOptionsData
     {
