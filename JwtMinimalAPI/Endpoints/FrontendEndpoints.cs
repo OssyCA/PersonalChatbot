@@ -97,7 +97,7 @@ namespace JwtMinimalAPI.Endpoints
             // endpoint to refresh the token
             // Update refresh token endpoint
             // In FrontendEndpoints.cs
-            app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service, MiniJwtDbContext dbContext) =>
+            app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service) =>
             {
                 // Check if refresh token exists in cookies
                 if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out string? refreshToken))
@@ -105,29 +105,51 @@ namespace JwtMinimalAPI.Endpoints
                     return Results.Unauthorized();
                 }
 
-                // Find user with this refresh token
-                var user = await dbContext.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-                if (user == null || user.RefreshTokenExpireTime <= DateTime.UtcNow)
+                // Extract user ID from the access token (even if it's expired)
+                try
+                {
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var accessToken = httpContext.Request.Cookies["accessToken"];
+
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    var tokenWithoutValidation = tokenHandler.ReadJwtToken(accessToken); // Read the token without validation
+                    var userIdClaim = tokenWithoutValidation.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                    if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out Guid userId))
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    // Create the request object to refresh the token pair
+                    var refreshRequest = new RequestRefreshTokenDto
+                    {
+                        UserId = userId,
+                        RefreshToken = refreshToken
+                    };
+
+                    // Use the service method
+                    var tokenResponse = await service.RefreshTokenPairAsync(refreshRequest);
+
+                    if (tokenResponse == null)
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    // Set new cookies
+                    httpContext.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, GetCookieOptionsData.AccessTokenCookie());
+                    httpContext.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, GetCookieOptionsData.RefreshTokenCookie());
+
+                    return Results.Ok(new { success = true });
+                }
+                catch
                 {
                     return Results.Unauthorized();
                 }
-
-                // Generate new token pair
-                var accessToken = service.CreateToken(user); // Create a public method for token creation
-                var newRefreshToken = service.GenerateRefreshToken(); // Make this public
-
-                // Update user in database
-                user.RefreshToken = newRefreshToken;
-                user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(7);
-                await dbContext.SaveChangesAsync();
-
-                // Set cookies
-                httpContext.Response.Cookies.Append("accessToken", accessToken, GetCookieOptionsData.AccessTokenCookie());
-
-                httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, GetCookieOptionsData.RefreshTokenCookie());
-
-                return Results.Ok(new { success = true });
-            }).AllowAnonymous(); // Important - make sure this endpoint is accessible without authentication
+            }).AllowAnonymous();
             // endpoint to test authentication
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
