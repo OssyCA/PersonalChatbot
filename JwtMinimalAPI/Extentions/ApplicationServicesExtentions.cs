@@ -8,6 +8,7 @@ namespace JwtMinimalAPI.Extentions
     {
         public static IServiceCollection ApplicationServices(this IServiceCollection services)
         {
+            services.AddOpenApi();
             // Add services to the container.
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMailService, MailService>();

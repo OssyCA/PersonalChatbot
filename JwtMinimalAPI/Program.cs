@@ -26,104 +26,10 @@ namespace JwtMinimalAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            #region Services
-            // Add services to the container.
-            builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins", policy =>
-                {
-                    policy.WithOrigins("http://localhost:5173", "http://localhost:5174") // Update with your React app URL
-                          .AllowAnyMethod()
-                          .AllowAnyHeader()
-                          .AllowCredentials(); // This is important for cookies
-                });
-            });
-            builder.Services.AddDbContext<MiniJwtDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase"));
-            });
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = builder.Configuration["Appsettings:Issuer"],
-                    ValidateAudience = true,
-                    ValidAudience = builder.Configuration["Appsettings:Audience"],
-                    ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Appsettings:Token")!)),
-                    ValidateIssuerSigningKey = true
-                };
-                options.Events = new JwtBearerEvents // this override to look for tookens in cookies
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["accessToken"];
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
-            // Get the GmailOptions section from the appsettings.json file
-            builder.Services.Configure<GmailOptions>(
-                builder.Configuration.GetSection(GmailOptions.GmailOptionsKey));
 
 
-            builder.Services
-                .AddScoped<IAuthService, AuthService>()
-                .AddScoped<ChatBotService>()
-                .AddScoped<IMailService, MailService>()
-                .AddScoped<PasswordService>()
-                .AddScoped<IAdminService, AdminService>();
-                        
 
-            builder.Services.AddRateLimiter(options => 
-            {
-                // Add a policy to the options with a partition key to rate limit the login endpoint per IP address
-                options.AddPolicy("login", httpcontext => RateLimitPartition.GetFixedWindowLimiter( // get the rate limiter with a fixed window
-                    partitionKey: httpcontext.Connection.RemoteIpAddress?.ToString() ?? "UNKNOWN", // Use the IP address as the partition key
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        AutoReplenishment = true, // Enable auto-replenishment so that the rate limiter will automatically replenish the limit
-                        PermitLimit = 5, // Set the limit to 5 requests
-                        QueueLimit = 0, // Set the queue limit to 0, get a 429(to many request) response when the limit is reached
-                        Window = TimeSpan.FromMinutes(10) // Set the window to 10 minutes
-                    }));
-            });
-
-
-            #endregion
-
-            #region Builder
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-                app.MapScalarApiReference();
-            }
-            app.UseExceptionHandling();        // 1. Exception handling should be first
-            app.UseHttpsRedirection();         // 2. HTTPS redirection early
-            app.UseCors("AllowAllOrigins");    // 3. CORS headers before authentication
-            app.UseAuthentication();           // 4. Authentication before refresh
-            app.UseTokenRefresh();             // 5. Token refresh after authentication
-            app.UseAuthorization();            // 6. Authorization after authentication
-            app.UseRateLimiter();
-
-            #endregion
-
-            AdminEndpoints.GetAdminEndpoints(app);
-            UserEndpoints.GetUserEndpoints(app);
-            ChatBotEndpoints.GetChatBotEndpoints(app);
-            PasswordEndpoints.GetPasswordEndpoints(app);
 
 
             app.Run();
