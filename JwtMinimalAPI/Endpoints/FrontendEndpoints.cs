@@ -49,9 +49,6 @@ namespace JwtMinimalAPI.Endpoints
 
 
             });
-
-            // In the login endpoint
-            // In FrontendEndpoints.cs
             app.MapPost("/login", async (LoginDto request, IAuthService service, HttpContext httpContext) =>
             {
                 var tokenResponse = await service.AuthenticateUserAsync(request);
@@ -82,9 +79,6 @@ namespace JwtMinimalAPI.Endpoints
 
                 //return Results.Ok(tokenResponse); // use to return the token response in scalar api test
             });
-
-
-
             app.MapPost("/logout", (HttpContext httpContext) =>
             {
                 // Clear cookies
@@ -93,10 +87,6 @@ namespace JwtMinimalAPI.Endpoints
 
                 return Results.Ok("Logged out successfully");
             });
-
-            // endpoint to refresh the token
-            // Update refresh token endpoint
-            // In FrontendEndpoints.cs
             app.MapPost("/refresh-token", async (HttpContext httpContext, IAuthService service) =>
             {
                 // Check if refresh token exists in cookies
@@ -153,7 +143,6 @@ namespace JwtMinimalAPI.Endpoints
             // endpoint to test authentication
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
            .WithName("AuthTest");
-            // In FrontendEndpoints.cs
             app.MapGet("/api/public-test", () => Results.Ok(new { message = "This is a public endpoint" }));
         }
         public static void HandleChatBot(WebApplication app)
@@ -180,7 +169,6 @@ namespace JwtMinimalAPI.Endpoints
                 }
             });
         }
-
         public static void AdminManage(WebApplication app)
         {
             app.MapGet("api/GetUsers", async (IAdminService service) =>
