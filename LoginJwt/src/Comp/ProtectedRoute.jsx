@@ -1,17 +1,43 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  // Simple check for username in localStorage
-  const isLoggedIn = !!localStorage.getItem("username");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // If not logged in, redirect to login
-  if (!isLoggedIn) {
-    return <Navigate to="/login" />;
+  useEffect(() => {
+    const verifyAuth = async () => {
+      try {
+        const response = await fetch("https://localhost:7289/api/auth-test", {
+          method: "GET",
+          credentials: "include", // Include cookies in the request
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    verifyAuth(); // Call the function to verify authentication
+  }, []); // runs once on mount
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show a loading state while checking authentication
   }
 
-  // If logged in, render the protected route
-  return <Outlet />;
+  // if authenticated, render the child routes
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" replace /> // Redirect to login if not authenticated
+  );
 };
 
 export default ProtectedRoute;
