@@ -119,11 +119,11 @@ namespace JwtMinimalAPI
 
             #endregion
 
-            //TestingPoints.HandleUsers(app);
-            FrontendEndpoints.HandleUser(app);
-            FrontendEndpoints.HandleChatBot(app);
-            FrontendEndpoints.ChangePassword(app);
-            FrontendEndpoints.AdminManage(app);
+            AdminEndpoints.GetAdminEndpoints(app);
+            UserEndpoints.GetUserEndpoints(app);
+            ChatBotEndpoints.GetChatBotEndpoints(app);
+            PasswordEndpoints.GetPasswordEndpoints(app);
+
 
             app.Run();
         }
