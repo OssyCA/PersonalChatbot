@@ -13,7 +13,7 @@ namespace JwtMinimalAPI.Endpoints
         public static void GetUserEndpoints(WebApplication app)
         {
             app.MapPost("/register", RegisterUser);
-            app.MapPost("/login", LoginUser);
+            app.MapPost("/login", LoginUser).RequireRateLimiting("login");
             app.MapPost("/logout", LogoutUser);
             app.MapPost("/refresh-token", RefreshToken).AllowAnonymous();
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
