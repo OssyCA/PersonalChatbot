@@ -6,6 +6,7 @@ using JwtMinimalAPI.Helpers.EmailConfig;
 using JwtMinimalAPI.Middlewere;
 using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -78,8 +79,8 @@ namespace JwtMinimalAPI
             builder.Services
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<ChatBotService>()
-                .AddScoped<IMailService, GmailSerivce>()
-                .AddScoped<ChangePasswordService>()
+                .AddScoped<IMailService, MailService>()
+                .AddScoped<PasswordService>()
                 .AddScoped<IAdminService, AdminService>();
                         
 

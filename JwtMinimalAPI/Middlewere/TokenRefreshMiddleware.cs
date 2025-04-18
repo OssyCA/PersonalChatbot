@@ -1,6 +1,6 @@
 ﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers;
-using JwtMinimalAPI.Services;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

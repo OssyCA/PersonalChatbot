@@ -2,6 +2,7 @@
 using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers;
 using JwtMinimalAPI.Models;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,7 @@ namespace JwtMinimalAPI.Services
         public async Task<User?> RegisterAsync(UserDto request)
         {
             // check if the user already exists and if the email is already in use
-            if (await context.Users.AnyAsync(u => u.UserName == request.UserName) && await context.Users.AnyAsync(e => e.Email == request.Email))
+            if (await context.Users.AnyAsync(u => u.UserName == request.UserName) || await context.Users.AnyAsync(e => e.Email == request.Email))
             {
                 return null;
             }

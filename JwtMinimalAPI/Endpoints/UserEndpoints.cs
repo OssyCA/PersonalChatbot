@@ -1,10 +1,10 @@
 ﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Helpers.EmailConfig;
 using JwtMinimalAPI.Helpers;
-using JwtMinimalAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 
 namespace JwtMinimalAPI.Endpoints
 {

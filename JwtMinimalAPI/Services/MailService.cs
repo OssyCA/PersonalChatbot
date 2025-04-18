@@ -1,12 +1,12 @@
 ﻿using JwtMinimalAPI.Helpers.EmailConfig;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
-using System.Net;
 using System.Net.Mail;
+using System.Net;
+using Microsoft.Extensions.Options;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 
 namespace JwtMinimalAPI.Services
 {
-    public class GmailSerivce(IOptions<GmailOptions> gmailOptions) : IMailService
+    public class MailService(IOptions<GmailOptions> gmailOptions) : IMailService
     {
         private readonly GmailOptions _gmailOptions = gmailOptions.Value; // Gmail SMTP server configuration
         public async Task<bool> SendEmailAsync(SendEmailRequest sendEmailRequest)
@@ -39,3 +39,4 @@ namespace JwtMinimalAPI.Services
         }
     }
 }
+

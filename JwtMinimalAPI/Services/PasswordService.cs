@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+﻿
 using JwtMinimalAPI.Data;
 using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Models;
@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JwtMinimalAPI.Services
 {
-    public class ChangePasswordService(MiniJwtDbContext context)
+    public class PasswordService(MiniJwtDbContext context)
     {
         public async Task<bool> ChangedPassword(ChangePasswordDto dto)
         {
@@ -18,7 +18,7 @@ namespace JwtMinimalAPI.Services
                 // User not found
                 return false;
             }
-            
+
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, dto.OldPassword)
                 == PasswordVerificationResult.Failed)
             {
@@ -36,8 +36,6 @@ namespace JwtMinimalAPI.Services
                 await context.SaveChangesAsync();
                 return true;
             }
-
-            
         }
     }
 }

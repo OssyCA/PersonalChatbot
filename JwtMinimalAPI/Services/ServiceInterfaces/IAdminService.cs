@@ -2,7 +2,7 @@
 using JwtMinimalAPI.Models;
 using System.ComponentModel;
 
-namespace JwtMinimalAPI.Services
+namespace JwtMinimalAPI.Services.ServiceInterfaces
 {
     public interface IAdminService
     {

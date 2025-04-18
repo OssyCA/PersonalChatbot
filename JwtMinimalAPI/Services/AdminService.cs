@@ -1,6 +1,7 @@
 ﻿using JwtMinimalAPI.Data;
 using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Models;
+using JwtMinimalAPI.Services.ServiceInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace JwtMinimalAPI.Services

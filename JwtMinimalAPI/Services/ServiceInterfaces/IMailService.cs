@@ -1,6 +1,6 @@
 ﻿using JwtMinimalAPI.Helpers.EmailConfig;
 
-namespace JwtMinimalAPI.Services
+namespace JwtMinimalAPI.Services.ServiceInterfaces
 {
     public interface IMailService
     {
