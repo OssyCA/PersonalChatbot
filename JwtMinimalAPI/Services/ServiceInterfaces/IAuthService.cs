@@ -1,7 +1,7 @@
 ﻿using JwtMinimalAPI.DTO;
 using JwtMinimalAPI.Models;
 
-namespace JwtMinimalAPI.Services
+namespace JwtMinimalAPI.Services.ServiceInterfaces
 {
     public interface IAuthService
     {

@@ -1,4 +1,4 @@
-﻿using JwtMinimalAPI.Services;
+﻿using JwtMinimalAPI.Services.ServiceInterfaces;
 
 namespace JwtMinimalAPI.Endpoints
 {

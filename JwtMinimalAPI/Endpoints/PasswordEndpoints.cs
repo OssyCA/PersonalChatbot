@@ -10,7 +10,7 @@ namespace JwtMinimalAPI.Endpoints
             app.MapPost("/change-password", ChangeUserPassword);
             //app.MapPost("/reset-password", ResetPassword);
         }
-        private static async Task<IResult> ChangeUserPassword(ChangePasswordService change, ChangePasswordDto dto)
+        private static async Task<IResult> ChangeUserPassword(PasswordService change, ChangePasswordDto dto)
         {
             var changedPassword = await change.ChangedPassword(dto);
 
