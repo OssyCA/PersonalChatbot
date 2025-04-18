@@ -59,7 +59,7 @@ const Login = () => {
         localStorage.setItem("email", userData.email);
       }
 
-      navigate("/user-dashboard");
+      navigate("/userdashboard");
     } catch (error) {
       console.error("Error:", error);
       setError("An unexpected error occurred. Please try again later.");

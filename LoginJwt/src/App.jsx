@@ -5,6 +5,7 @@ import ChatBot from "./Pages/ChatBot";
 import ProtectedRoute from "./Comp/ProtectedRoute";
 import UserDashboard from "./Pages/UserDashboard";
 import AdminDashboard from "./Pages/AdminDashboard";
+import ResetPassword from "./Pages/ResetPassword";
 import Navbar from "./Comp/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -18,12 +19,12 @@ function App() {
             <Route path="/" element={<StartScreen />} />
             <Route path="/register" element={<Register />} />
             <Route path="/Login" element={<Login />} />
-            <Route path="/start-screen" element={<StartScreen />} />
+            <Route path="/startscreen" element={<StartScreen />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             {/* Protected Routes*/}
             <Route element={<ProtectedRoute />}>
               <Route path="/chatbot" element={<ChatBot />} />
-              <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route path="/userdashboard" element={<UserDashboard />} />
             </Route>
           </Routes>
         </main>
