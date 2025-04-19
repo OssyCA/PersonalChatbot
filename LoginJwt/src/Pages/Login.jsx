@@ -6,7 +6,7 @@ const Login = () => {
       <LoginForm />
       <div className="form-section">
         <p>
-          <a href="#">Forgot password?</a>
+          <a href="/resetpassword">Forgot password?</a>
         </p>
         <p>
           <a href="/register">Don't have an account?</a>
