@@ -23,5 +23,9 @@ namespace JwtMinimalAPI.Endpoints
                 return Results.BadRequest();
             }
         }
+        private static async Task<IResult> ForgotPassword(PasswordService forgot, ResetPasswordDto dto)
+        {
+            return Results.Ok("Password changed");
+        }
     }
 }

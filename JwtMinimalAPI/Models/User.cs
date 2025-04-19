@@ -16,6 +16,8 @@ namespace JwtMinimalAPI.Models
         public string Role { get; set; } = string.Empty;
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpireTime { get; set; }
+        public Guid? ForgotPasswordToken { get; set; }
+        public DateTime? ForgotPasswordTokenExpireTime { get; set; }
 
     }
 }

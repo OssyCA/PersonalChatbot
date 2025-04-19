@@ -48,7 +48,6 @@ namespace JwtMinimalAPI.Endpoints
 
             return Results.Ok(user);
         }
-
         private static async Task<IResult> LoginUser(LoginDto request, IAuthService service, HttpContext httpContext)
         {
             var tokenResponse = await service.AuthenticateUserAsync(request);
@@ -76,16 +75,16 @@ namespace JwtMinimalAPI.Endpoints
                 email = user.Email
             });
         }
-
         private static IResult LogoutUser(HttpContext httpContext)
         {
+            // REVOKE REFRESH TOKEN LATER
+
             // Clear cookies
             httpContext.Response.Cookies.Delete("accessToken", GetCookieOptionsData.AccessTokenCookie());
             httpContext.Response.Cookies.Delete("refreshToken", GetCookieOptionsData.RefreshTokenCookie());
 
             return Results.Ok("Logged out successfully");
         }
-
         private static async Task<IResult> RefreshToken(HttpContext httpContext, IAuthService service)
         {
             // Check if refresh token exists in cookies
@@ -140,5 +139,4 @@ namespace JwtMinimalAPI.Endpoints
             }
         }
     }
-
 }

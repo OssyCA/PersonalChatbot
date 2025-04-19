@@ -37,5 +37,26 @@ namespace JwtMinimalAPI.Services
                 return true;
             }
         }
+        public async Task<bool> ResetPassword(ResetPasswordDto dto)
+        {
+            //var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == dto.UserName);
+            //if (user == null)
+            //{
+            //    // User not found
+            //    return false;
+            //}
+            //if (user.ForgotPasswordToken != dto.Token || user.ForgotPasswordTokenExpireTime < DateTime.UtcNow)
+            //{
+            //    // Token is invalid or expired
+            //    return false;
+            //}
+            //// Hash the new password
+            //var hashedNew = new PasswordHasher<User>()
+            //    .HashPassword(user, dto.NewPassword);
+            //user.PasswordHash = hashedNew;
+            //await context.SaveChangesAsync();
+            //return true;
+            return false;
+        }
     }
 }
