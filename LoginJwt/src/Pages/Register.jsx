@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../Utils/AuthUtils";
-
+// Add form to form folder later
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
