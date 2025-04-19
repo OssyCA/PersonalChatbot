@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TokenTestButton from "../Comp/TokenTestButton";
-import ChangePasswordForm from "../Comp/ChangePasswordForm";
+import ChangePasswordForm from "../Forms/ChangePasswordForm";
 import LogoutButton from "../Comp/LogoutButton";
 
 const UserDashboard = () => {

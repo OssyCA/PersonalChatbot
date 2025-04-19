@@ -21,6 +21,7 @@ function App() {
             <Route path="/Login" element={<Login />} />
             <Route path="/startscreen" element={<StartScreen />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/resetpassword" element={<ResetPassword />} />
             {/* Protected Routes*/}
             <Route element={<ProtectedRoute />}>
               <Route path="/chatbot" element={<ChatBot />} />
