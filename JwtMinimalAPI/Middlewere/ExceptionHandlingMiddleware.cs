@@ -16,11 +16,11 @@ namespace JwtMinimalAPI.Middlewere
             {
                 if (ex is ArgumentException || ex is ValidationException)
                 {
-                    _logger.LogWarning($"Validation error");
+                    _logger.LogWarning(ex, "Validation error: {Message}", ex.Message);
                 }
                 else if (ex is UnauthorizedAccessException)
                 {
-                    _logger.LogWarning("Unathoraized");
+                    _logger.LogError(ex, "Unexpected error occurred: {Message}", ex.Message);
                 }
                 else
                 {
@@ -36,7 +36,7 @@ namespace JwtMinimalAPI.Middlewere
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            if (exception is ArgumentException && exception is ValidationException)
+            if (exception is ArgumentException || exception is ValidationException)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
                 return CreateResponse(context, "Validation error check  input data");
