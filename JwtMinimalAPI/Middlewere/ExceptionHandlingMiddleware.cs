@@ -1,28 +1,32 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Text.Json;
 
 namespace JwtMinimalAPI.Middlewere
 {
-    public class ExceptionHandlingMiddleware // to handle exceptions in the application globally
+    public class ExceptionHandlingMiddleware(RequestDelegate _next, ILogger<ExceptionHandlingMiddleware> _logger) // to handle exceptions in the application globally
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
-
         public async Task InvokeAsync(HttpContext context) // heart of the middleware
         {
             try
             {
-                await _next(context); // if no exception occurs, continue to the next middleware, like authentication
+                await _next(context); // if no error found go to next middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred");
+                if (ex is ArgumentException || ex is ValidationException)
+                {
+                    _logger.LogWarning($"Validation error");
+                }
+                else if (ex is UnauthorizedAccessException)
+                {
+                    _logger.LogWarning("Unathoraized");
+                }
+                else
+                {
+                    _logger.LogError("Unexpected error");
+                }
+
                 await HandleExceptionAsync(context, ex);
             }
         }
@@ -32,14 +36,34 @@ namespace JwtMinimalAPI.Middlewere
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            // In production, don't expose the actual error message to clients
+            if (exception is ArgumentException && exception is ValidationException)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
+                return CreateResponse(context, "Validation error check  input data");
+            }
+            else if (exception is KeyNotFoundException)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                return CreateResponse(context, "Cant be found");
+            }
+            // Add more errors
+            else
+            {
+                // Standardfel - 500 Internal Server Error
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return CreateResponse(context, "Error Error ");
+            }
+        }
+
+        public static Task CreateResponse(HttpContext context, string message)
+        {
             var response = new
             {
-                StatusCode = context.Response.StatusCode, // Get the status code
-                Message = "An error occurred while processing your request."
+                context.Response.StatusCode,
+                Message = message
             };
-
-            var options = new JsonSerializerOptions
+            
+            var options = new JsonSerializerOptions 
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
@@ -47,9 +71,8 @@ namespace JwtMinimalAPI.Middlewere
             var json = JsonSerializer.Serialize(response, options);
             return context.Response.WriteAsync(json);
         }
-
-
     }
+    
     // Extension method for easy registration in Program.cs
     public static class ExceptionHandlingMiddlewareExtensions
     {
