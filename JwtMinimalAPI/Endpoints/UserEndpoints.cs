@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using JwtMinimalAPI.Services.ServiceInterfaces;
+using JwtMinimalAPI.Services;
 
 namespace JwtMinimalAPI.Endpoints
 {
@@ -16,6 +17,9 @@ namespace JwtMinimalAPI.Endpoints
             app.MapPost("/login", LoginUser).RequireRateLimiting("login");
             app.MapPost("/logout", LogoutUser);
             app.MapPost("/refresh-token", RefreshToken).AllowAnonymous();
+            app.MapPost("/api/reset-password", ResetPassword).AllowAnonymous();
+
+            // Test endpoints
             app.MapGet("/api/auth-test", [Authorize] () => new { message = "Authentication successful" })
                 .WithName("AuthTest");
             app.MapGet("/api/public-test", () => Results.Ok(new { message = "This is a public endpoint" }));
@@ -136,6 +140,24 @@ namespace JwtMinimalAPI.Endpoints
             catch
             {
                 return Results.Unauthorized();
+            }
+        }
+        private static async Task<IResult> ResetPassword(ResetPasswordDto dto, PasswordService passwordService)
+        {
+            var validateErrors = ValidateObjects.ValidateObject(dto);
+            if (validateErrors.Count > 0)
+            {
+                return Results.BadRequest(new { errors = validateErrors });
+            }
+            var result = await passwordService.ResetPassword(dto);
+
+            if (result)
+            {
+                return Results.Ok("Password reset successfully");
+            }
+            else
+            {
+                return Results.BadRequest("Failed to reset password");
             }
         }
     }
