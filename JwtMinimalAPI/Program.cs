@@ -34,7 +34,7 @@ namespace JwtMinimalAPI
             //    .WriteTo.Console()
             //    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day));
 
-          
+            // Add services to the container.
             builder.Services
                 .AddDatabaseServices(builder.Configuration)    // Add DbContext and Identity
                 .AddCorsPolicy()                                // Add CORS policy
