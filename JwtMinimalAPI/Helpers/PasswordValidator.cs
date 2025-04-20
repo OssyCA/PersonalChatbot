@@ -6,7 +6,7 @@ namespace JwtMinimalAPI.Helpers
     {
         public static bool IsValid(string password, out List<string> errors)
         {
-            errors = new List<string>();
+            errors = [];
 
             // Check minimum length
             if (password.Length < 8)

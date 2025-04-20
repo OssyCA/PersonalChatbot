@@ -18,14 +18,19 @@ namespace JwtMinimalAPI.Services
             if (user == null)
             {
                 // User not found
-                return false;
+                throw new KeyNotFoundException();
             }
 
+            // Validate password strength
+            if (!PasswordValidator.IsValid(dto.NewPassword, out var passwordErrors))
+            {
+                throw new ArgumentException(string.Join(", ", passwordErrors));
+            }
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, dto.OldPassword)
                 == PasswordVerificationResult.Failed)
             {
                 // Old password is incorrect
-                return false;
+                throw new UnauthorizedAccessException();
             }
             else
             {
