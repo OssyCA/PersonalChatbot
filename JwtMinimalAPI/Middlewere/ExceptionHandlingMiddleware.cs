@@ -36,23 +36,17 @@ namespace JwtMinimalAPI.Middlewere
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            if (exception is ArgumentException || exception is ValidationException)
+            (string message, HttpStatusCode status) = exception switch
             {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
-                return CreateResponse(context, "Validation error check  input data");
-            }
-            else if (exception is KeyNotFoundException)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                return CreateResponse(context, "Cant be found");
-            }
-            // Add more errors
-            else
-            {
-                // Standardfel - 500 Internal Server Error
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                return CreateResponse(context, "Error Error ");
-            }
+                ArgumentException or ValidationException => ("Validation error, check input data", HttpStatusCode.BadRequest),
+                KeyNotFoundException => ("Can't be found", HttpStatusCode.NotFound),
+                UnauthorizedAccessException => ("Unauthorized access", HttpStatusCode.Unauthorized),
+                _ => ("Unexpected server error", HttpStatusCode.InternalServerError)
+            };
+
+            context.Response.StatusCode = (int)status;
+            return CreateResponse(context, message);
+
         }
 
         public static Task CreateResponse(HttpContext context, string message)
