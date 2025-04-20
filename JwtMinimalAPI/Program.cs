@@ -30,9 +30,9 @@ namespace JwtMinimalAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Advanced Logging
-            //builder.Host.UseSerilog((ctx, lc) => lc
-            //    .WriteTo.Console()
-            //    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day));
+            builder.Host.UseSerilog((ctx, lc) => lc
+                .WriteTo.Console()
+                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day));
 
             // Add services to the container.
             builder.Services
