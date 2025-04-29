@@ -11,6 +11,8 @@ namespace JwtMinimalAPI.Extentions
             ChatBotEndpoints.GetChatBotEndpoints(app);
             PasswordEndpoints.GetPasswordEndpoints(app);
 
+            
+
             return app;
         }
     }

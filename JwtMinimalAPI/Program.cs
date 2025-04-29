@@ -8,6 +8,7 @@ using JwtMinimalAPI.Middlewere;
 using JwtMinimalAPI.Models;
 using JwtMinimalAPI.Services;
 using JwtMinimalAPI.Services.ServiceInterfaces;
+using JwtMinimalAPI.StripeConfigs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -42,6 +43,7 @@ namespace JwtMinimalAPI
                 .GetMailConfig(builder.Configuration)           // Add Email Configuration
                 .AddRateLimit()                                 // Add Rate Limiting
                 .ApplicationServices();                         // Add Application Services
+
 
             var app = builder.Build(); // Build the application
 

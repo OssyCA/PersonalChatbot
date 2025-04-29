@@ -6,6 +6,7 @@ import ProtectedRoute from "./Comp/ProtectedRoute";
 import UserDashboard from "./Pages/UserDashboard";
 import AdminDashboard from "./Pages/AdminDashboard";
 import ResetPassword from "./Pages/ResetPassword";
+import TestStripe from "./Pages/TestStripe";
 import Navbar from "./Comp/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -16,6 +17,8 @@ function App() {
         <Navbar />
         <main>
           <Routes>
+            <Route path="/teststripe" element={<TestStripe />} />
+            {/* Public Routes */}
             <Route path="/" element={<StartScreen />} />
             <Route path="/register" element={<Register />} />
             <Route path="/Login" element={<Login />} />

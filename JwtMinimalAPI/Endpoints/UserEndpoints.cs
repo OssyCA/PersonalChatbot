@@ -11,6 +11,7 @@ namespace JwtMinimalAPI.Endpoints
 {
     public static class UserEndpoints
     {
+        // FIX LOGOUT AND GETUSERMETOD, ADD USERID TO COOKIES
         public static void GetUserEndpoints(WebApplication app)
         {
             app.MapPost("/register", RegisterUser);
