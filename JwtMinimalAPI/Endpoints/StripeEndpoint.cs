@@ -1,68 +1,71 @@
 ﻿using JwtMinimalAPI.StripeConfigs;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
 
 namespace JwtMinimalAPI.Endpoints
 {
-    public class StripeEndpoint(StripeModel model, CustomerService customerService, ProductService productService)
+    public static class StripeEndpoints
     {
-        private readonly StripeModel model = model;
-        private readonly CustomerService customerService = customerService;
-        private readonly ProductService productService = productService;
-
-        public void GetStripeEndpoints(WebApplication app)
+        public static void GetStripeEndpoints(WebApplication app)
         {
             app.MapPost("api/stripe/Pay", Pay);
-
-            app.MapGet("api/stripe/GetProducts", async () =>
-            {
-                StripeConfiguration.ApiKey = model.SecretKey; // Get the secret key from the configuration
-                var options = new ProductListOptions { Expand = ["data.default_price"] }; // Expand the default price
-                var service = new ProductService();
-                var products = await service.ListAsync(options);
-                return Results.Ok(products); // Return the list of products
-            });
-            app.MapPost("api/stripe/CreateCustomer", async (StripeCustomer customerInfo) =>
-            {
-                StripeConfiguration.ApiKey = model.SecretKey;
-
-                var customerOptions = new CustomerCreateOptions
-                {
-                    Email = customerInfo.Email,
-                    Name = customerInfo.Name
-                };
-
-                var customer = await customerService.CreateAsync(customerOptions);
-
-                return Results.Ok(new { customer });
-            });
+            app.MapGet("api/stripe/GetProducts", GetProducts);
+            app.MapPost("api/stripe/CreateCustomer", CreateCustomer);
         }
 
-        public async Task<IResult> Pay(string priceId)  // currently guest checkout
+        private static async Task<IResult> Pay(string priceId, IOptions<StripeModel> options)
         {
-            StripeConfiguration.ApiKey = model.SecretKey; // Get the secret key from the configuration
+            var model = options.Value;
+            StripeConfiguration.ApiKey = model.SecretKey;
 
-            var options = new SessionCreateOptions
+            var sessionOptions = new SessionCreateOptions
             {
                 LineItems = new List<SessionLineItemOptions>
                 {
                     new SessionLineItemOptions
                     {
-                        Price = priceId, // Get the price ID from the request
+                        Price = priceId,
                         Quantity = 1,
                     },
                 },
                 Mode = "payment",
-                SuccessUrl = "https://example.com/success", // fix Later    
-                CancelUrl = "https://example.com/cancel" // fix Later
+                SuccessUrl = "https://example.com/success",
+                CancelUrl = "https://example.com/cancel"
             };
-
+            //sessionOptions.Customer = "cus_SDfKUgt7GYAlgU";
             var service = new SessionService();
+            Session session = service.Create(sessionOptions);
 
-            Session session = service.Create(options);
+            return Results.Ok(session.Url);
+        }
 
-            return Results.Ok(session.Url); // Return the session URL for redirection
+        private static async Task<IResult> GetProducts(IOptions<StripeModel> options)
+        {
+            var model = options.Value;
+            StripeConfiguration.ApiKey = model.SecretKey;
+
+            var productOptions = new ProductListOptions { Expand = ["data.default_price"] };
+            var service = new ProductService();
+            var products = await service.ListAsync(productOptions);
+
+            return Results.Ok(products);
+        }
+
+        private static async Task<IResult> CreateCustomer(StripeCustomer customerInfo, CustomerService customerService, IOptions<StripeModel> options)
+        {
+            var model = options.Value;
+            StripeConfiguration.ApiKey = model.SecretKey;
+
+            var customerOptions = new CustomerCreateOptions
+            {
+                Email = customerInfo.Email,
+                Name = customerInfo.Name
+            };
+            
+            var customer = await customerService.CreateAsync(customerOptions);
+
+            return Results.Ok(new { customer });
         }
     }
 }

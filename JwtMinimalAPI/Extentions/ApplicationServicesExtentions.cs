@@ -1,4 +1,5 @@
-﻿using JwtMinimalAPI.Services;
+﻿using JwtMinimalAPI.Endpoints;
+using JwtMinimalAPI.Services;
 using JwtMinimalAPI.Services.ServiceInterfaces;
 using JwtMinimalAPI.StripeConfigs;
 using Microsoft.IdentityModel.Tokens;
@@ -24,7 +25,7 @@ namespace JwtMinimalAPI.Extentions
             services.Configure<StripeModel>(configuration.GetSection("Stripe"));
             services.AddScoped<CustomerService>();
             services.AddScoped<ProductService>();
-            
+            services.AddScoped<Stripe.Checkout.SessionService>();
 
             return services;
         }
