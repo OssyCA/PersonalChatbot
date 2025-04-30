@@ -12,7 +12,7 @@ namespace JwtMinimalAPI.Extentions
             PasswordEndpoints.GetPasswordEndpoints(app);
 
             // Register Stripe endpoints
-            StripeEndpoints.GetStripeEndpoints(app);
+            StripeEndpoints.MapEndpoints(app);
 
 
             return app;

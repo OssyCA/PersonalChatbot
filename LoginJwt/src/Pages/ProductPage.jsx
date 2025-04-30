@@ -61,6 +61,29 @@ const LoadingSpinner = ({ message }) => (
   </div>
 );
 
+const ErrorDetails = ({ error }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  if (!error || !error.details) return null;
+
+  return (
+    <div className="error-details">
+      <button
+        className="btn btn-sm"
+        onClick={() => setShowDetails(!showDetails)}
+      >
+        {showDetails ? "Dölj detaljer" : "Visa feldetaljer"}
+      </button>
+
+      {showDetails && (
+        <div className="error-details-content">
+          <pre>{JSON.stringify(error.details, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CustomerForm = ({ customerInfo, onInputChange, product }) => (
   <div className="customer-form">
     <p>Fyll i dina uppgifter för att fortsätta med köpet:</p>
@@ -99,6 +122,9 @@ const CustomerForm = ({ customerInfo, onInputChange, product }) => (
           {product.price}{" "}
           {product.period && `(${product.period.toLowerCase()})`}
         </div>
+        <div className="product-priceId">
+          <small>Produkt-ID: {product.priceId}</small>
+        </div>
       </div>
     </div>
   </div>
@@ -113,6 +139,7 @@ const PurchaseModal = ({
   onConfirm,
   onContinue,
   loading,
+  error,
 }) => (
   <div className="modal-overlay">
     <div className="purchase-modal">
@@ -124,6 +151,13 @@ const PurchaseModal = ({
       </div>
 
       <div className="modal-body">
+        {error && (
+          <div className="error-message">
+            <p>{error.message || "Ett fel uppstod"}</p>
+            <ErrorDetails error={error} />
+          </div>
+        )}
+
         {showCustomerForm ? (
           <CustomerForm
             customerInfo={customerInfo}
@@ -140,6 +174,9 @@ const PurchaseModal = ({
                 <p className="price-period">{product.period}</p>
               )}
               <p className="product-description">{product.description}</p>
+              <p className="product-id">
+                <small>Produkt-ID: {product.priceId}</small>
+              </p>
             </div>
           </>
         )}
@@ -179,9 +216,8 @@ const PurchaseModal = ({
 const StripeService = {
   async getProducts() {
     try {
-      console.log("Hämtar produkter från Stripe API");
       const response = await fetch(
-        "https://localhost:7289/api/stripe/GetProducts",
+        "https://localhost:7289/api/stripe/products",
         {
           method: "GET",
           credentials: "include",
@@ -192,16 +228,23 @@ const StripeService = {
       );
 
       if (!response.ok) {
-        throw new Error(
-          `Kunde inte hämta produkter: ${response.status} ${response.statusText}`
-        );
+        const errorMessage = await this._getErrorMessage(response);
+        throw new Error(`Kunde inte hämta produkter: ${errorMessage}`);
       }
 
       const responseText = await response.text();
-      const products = JSON.parse(responseText);
-      return { success: true, products };
+
+      try {
+        const products = JSON.parse(responseText);
+        return { success: true, products };
+      } catch (parseError) {
+        return {
+          success: false,
+          error: "Kunde inte tolka produktdata",
+          details: { responseText: responseText.substring(0, 500) },
+        };
+      }
     } catch (error) {
-      console.error("Fel vid hämtning av produkter:", error);
       return {
         success: false,
         error: error.message || "Ett fel uppstod vid hämtning av produkter",
@@ -212,7 +255,7 @@ const StripeService = {
   async createCustomer(customerInfo) {
     try {
       const response = await fetch(
-        "https://localhost:7289/api/stripe/CreateCustomer",
+        "https://localhost:7289/api/stripe/customers",
         {
           method: "POST",
           headers: {
@@ -224,13 +267,13 @@ const StripeService = {
       );
 
       if (!response.ok) {
-        throw new Error("Kunde inte skapa kund");
+        const errorMessage = await this._getErrorMessage(response);
+        throw new Error(`Kunde inte skapa kund: ${errorMessage}`);
       }
 
       const customer = await response.json();
       return { success: true, customer };
     } catch (error) {
-      console.error("Fel vid skapande av kund:", error);
       return {
         success: false,
         error: error.message || "Ett fel uppstod vid skapande av kund",
@@ -240,48 +283,91 @@ const StripeService = {
 
   async processPayment(priceId) {
     try {
-      console.log("Anropar Stripe Pay API med priceId:", priceId);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 sekunder timeout
+
       const response = await fetch(
-        `https://localhost:7289/api/stripe/Pay?priceId=${priceId}`,
+        `https://localhost:7289/api/stripe/pay?priceId=${priceId}`,
         {
           method: "POST",
           credentials: "include",
+          signal: controller.signal,
         }
       );
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error("Kunde inte behandla betalningen");
+        const errorMessage = await this._getErrorMessage(response);
+        throw new Error(`Betalningsfel (${response.status}): ${errorMessage}`);
       }
 
       const stripeUrl = await response.text();
       const cleanUrl = stripeUrl.replace(/^"|"$/g, "").trim();
-
       return { success: true, redirectUrl: cleanUrl };
     } catch (error) {
-      console.error("Betalningsfel:", error);
+      if (error.name === "AbortError") {
+        return {
+          success: false,
+          message:
+            "Förfrågan tog för lång tid att slutföra. Servern svarar inte.",
+        };
+      }
+
       return {
         success: false,
-        error: error.message || "Ett fel uppstod vid betalningen",
+        message: error.message || "Ett fel uppstod vid betalningen",
       };
+    }
+  },
+
+  // Hjälpmetod för att extrahera felmeddelande från svar
+  async _getErrorMessage(response) {
+    try {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        if (errorData.message) return errorData.message;
+        if (errorData.error) return errorData.error;
+        return JSON.stringify(errorData);
+      } else {
+        return await response.text();
+      }
+    } catch (e) {
+      return `${response.status} ${response.statusText}`;
     }
   },
 };
 
 // Helper functions for formatting products
 const formatStripeProducts = (products) => {
-  return products.data.map((product) => {
-    const price = product.default_price;
-    return {
-      id: product.id,
-      priceId: price.id,
-      name: product.name,
-      price: `${(price.unit_amount / 100).toLocaleString("sv-SE")} kr`,
-      period: price.recurring ? `Per ${price.recurring.interval}` : null,
-      created: new Date(product.created * 1000).toLocaleDateString("sv-SE"),
-      updated: new Date(product.updated * 1000).toLocaleDateString("sv-SE"),
-      description: product.description || "Ingen beskrivning tillgänglig",
-    };
-  });
+  if (!products.data || !Array.isArray(products.data)) {
+    return [];
+  }
+
+  return products.data
+    .map((product) => {
+      if (!product.default_price) {
+        return null;
+      }
+
+      const price = product.default_price;
+      return {
+        id: product.id,
+        priceId: price.id,
+        name: product.name || "Namnlös produkt",
+        price: `${((price.unit_amount || 0) / 100).toLocaleString("sv-SE")} kr`,
+        period: price.recurring ? `Per ${price.recurring.interval}` : null,
+        created: new Date((product.created || 0) * 1000).toLocaleDateString(
+          "sv-SE"
+        ),
+        updated: new Date((product.updated || 0) * 1000).toLocaleDateString(
+          "sv-SE"
+        ),
+        description: product.description || "Ingen beskrivning tillgänglig",
+      };
+    })
+    .filter(Boolean); // Filtrera bort eventuella null-värden
 };
 
 // Main component
@@ -293,34 +379,45 @@ const ProductPage = () => {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [customerInfo, setCustomerInfo] = useState({ name: "", email: "" });
   const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch products when the component loads
   useEffect(() => {
     const loadProducts = async () => {
       setProductLoading(true);
+      setError(null);
+
       try {
         const result = await StripeService.getProducts();
 
         if (result.success && result.products && result.products.data) {
           const formattedProducts = formatStripeProducts(result.products);
           setProducts(formattedProducts);
-        } else {
-          // No products found
-          setProducts([]);
 
-          if (!result.success) {
-            console.warn(
-              "Kunde inte hämta produkter från Stripe API",
-              result.error
-            );
+          if (formattedProducts.length === 0) {
             setMessage({
-              text: "Kunde inte ladda produkter från servern. Kontakta support.",
-              type: "error",
+              text: "Inga produkter tillgängliga för tillfället.",
+              type: "warning",
             });
           }
+        } else {
+          setProducts([]);
+          setError({
+            message: result.error || "Kunde inte hämta produkter",
+            details: result.details,
+          });
+
+          setMessage({
+            text: "Kunde inte ladda produkter från servern.",
+            type: "error",
+          });
         }
       } catch (error) {
-        console.error("Fel vid inladdning av produkter:", error);
+        setError({
+          message: "Ett oväntat fel inträffade",
+          details: { errorMessage: error.message },
+        });
+
         setMessage({
           text: "Kunde inte ladda produkter. Försök igen senare eller kontakta support.",
           type: "error",
@@ -343,23 +440,27 @@ const ProductPage = () => {
 
   const handleBuyClick = (product) => {
     setSelectedProduct(product);
-    setShowCustomerForm(false); // First show confirmation view
+    setShowCustomerForm(false);
+    setError(null);
   };
 
   const handleContinueToCustomerForm = () => {
     setShowCustomerForm(true);
+    setError(null);
   };
 
   const handleCancelPurchase = () => {
     setSelectedProduct(null);
     setShowCustomerForm(false);
     setCustomerInfo({ name: "", email: "" });
+    setError(null);
   };
 
   const handleConfirmPurchase = async () => {
     if (!selectedProduct) return;
 
     setLoading(true);
+    setError(null);
     setMessage({ text: "Förbereder betalning...", type: "info" });
 
     try {
@@ -367,7 +468,7 @@ const ProductPage = () => {
       if (customerInfo.name && customerInfo.email) {
         const customerResult = await StripeService.createCustomer(customerInfo);
         if (!customerResult.success) {
-          throw new Error(`Kunde inte skapa kund: ${customerResult.error}`);
+          throw new Error(customerResult.error || "Kunde inte skapa kund");
         }
       }
 
@@ -378,34 +479,35 @@ const ProductPage = () => {
       });
 
       // Process payment
-      setTimeout(async () => {
-        try {
-          const paymentResult = await StripeService.processPayment(
-            selectedProduct.priceId
-          );
+      const paymentResult = await StripeService.processPayment(
+        selectedProduct.priceId
+      );
 
-          if (paymentResult.success) {
-            window.location.href = paymentResult.redirectUrl;
-          } else {
-            throw new Error(paymentResult.error);
-          }
+      if (paymentResult.success) {
+        // Redirect to Stripe checkout page
+        setTimeout(() => {
+          window.location.href = paymentResult.redirectUrl;
+        }, 500);
+      } else {
+        setError({
+          message: paymentResult.message || "Betalningen misslyckades",
+        });
 
-          // Code below only runs if the redirect fails
-          setLoading(false);
-        } catch (error) {
-          setMessage({
-            text: `Kunde inte dirigera till betalningssidan: ${error.message}`,
-            type: "error",
-          });
-          setLoading(false);
-        }
-      }, 1000);
+        setMessage({
+          text: "Betalningen kunde inte genomföras. Se felmeddelande för detaljer.",
+          type: "error",
+        });
+      }
     } catch (error) {
-      console.error("Betalningsfel:", error);
+      setError({
+        message: error.message || "Ett oväntat fel inträffade",
+      });
+
       setMessage({
         text: `Betalningsfel: ${error.message}`,
         type: "error",
       });
+    } finally {
       setLoading(false);
     }
   };
@@ -419,6 +521,13 @@ const ProductPage = () => {
 
       {message.text && (
         <div className={`message ${message.type}-message`}>{message.text}</div>
+      )}
+
+      {error && !selectedProduct && (
+        <div className="error-container">
+          <div className="error-message">{error.message}</div>
+          <ErrorDetails error={error} />
+        </div>
       )}
 
       <div className="product-table">
@@ -462,6 +571,7 @@ const ProductPage = () => {
           onConfirm={handleConfirmPurchase}
           onContinue={handleContinueToCustomerForm}
           loading={loading}
+          error={error}
         />
       )}
     </div>
