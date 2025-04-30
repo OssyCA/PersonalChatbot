@@ -18,7 +18,6 @@ function App() {
         <main>
           <Routes>
             {/* Public Routes */}
-            <Route path="/teststripe" element={<TestStripe />} />
             <Route path="/products" element={<ProductPage />} />
             <Route path="/" element={<StartScreen />} />
             <Route path="/register" element={<Register />} />
