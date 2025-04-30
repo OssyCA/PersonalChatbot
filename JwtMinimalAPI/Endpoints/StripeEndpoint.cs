@@ -76,7 +76,6 @@ namespace JwtMinimalAPI.Endpoints
                     statusCode: 500);
             }
         }
-
         private static async Task<IResult> GetProducts(IOptions<StripeModel> options)
         {
             StripeConfiguration.ApiKey = options.Value.SecretKey;
@@ -102,11 +101,7 @@ namespace JwtMinimalAPI.Endpoints
                     statusCode: 500);
             }
         }
-
-        private static async Task<IResult> CreateCustomer(
-            [FromBody] StripeCustomer customerInfo,
-            [FromServices] CustomerService customerService,
-            IOptions<StripeModel> options)
+        private static async Task<IResult> CreateCustomer([FromBody] StripeCustomer customerInfo, [FromServices] CustomerService customerService, IOptions<StripeModel> options)
         {
             if (string.IsNullOrEmpty(customerInfo.Email))
                 return Results.BadRequest("Customer email is required");
