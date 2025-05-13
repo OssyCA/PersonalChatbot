@@ -133,11 +133,11 @@ namespace JwtMinimalAPI.Services
         {
             return new TokenResponseDto { AccessToken = CreateToken(user), RefreshToken = await StoreRefreshTokenAsync(user) };
         }
-        public async Task<bool> RevokeRefreshTokenAsync(Guid userId, string refreshToken)
+        public async Task<bool> RevokeRefreshTokenAsync(Guid userId)
         {
             var user = await context.Users.FindAsync(userId);
 
-            if (user is null || user.RefreshToken != refreshToken)  // To prevent the user from revoking another user's token
+            if (user is null)  // To prevent the user from revoking another user's token
             {
                 return false;
             }
@@ -148,10 +148,6 @@ namespace JwtMinimalAPI.Services
             await context.SaveChangesAsync();
 
             return true;
-        } // Fix blacklisted tokens in the future
-        public async Task<User?> GetUserByUsernameAsync(string username)
-        {
-            return await context.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        }
+        } 
     }
 }

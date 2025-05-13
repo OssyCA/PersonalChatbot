@@ -15,7 +15,7 @@ namespace JwtMinimalAPI.Helpers
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             };
         }
-        public static CookieOptions RefreshTokenCookie()
+        public static CookieOptions RefreshTokenAndUserIdCookie()
         {
             return new CookieOptions
             {

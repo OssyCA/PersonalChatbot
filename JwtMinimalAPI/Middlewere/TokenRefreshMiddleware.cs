@@ -78,7 +78,7 @@ namespace JwtMinimalAPI.Middlewere
                                 context.Response.Cookies.Append("accessToken", tokenResponse.AccessToken, GetCookieOptionsData.AccessTokenCookie());
 
                                 // Set new refresh token cookie
-                                context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, GetCookieOptionsData.RefreshTokenCookie());
+                                context.Response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, GetCookieOptionsData.RefreshTokenAndUserIdCookie());
                             }
                             else
                             {
