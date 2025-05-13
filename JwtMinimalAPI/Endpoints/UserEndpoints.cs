@@ -23,10 +23,10 @@ namespace JwtMinimalAPI.Endpoints
             _logger = app.Services.GetRequiredService<ILogger<UserEndpoints>>();
 
 
-            app.MapPost("/register", RegisterUser);
-            app.MapPost("/login", LoginUser).RequireRateLimiting("login");
-            app.MapPost("/logout", LogoutUser);
-            app.MapPost("/refresh-token", RefreshToken).AllowAnonymous();
+            app.MapPost("/api/register", RegisterUser);
+            app.MapPost("/api/login", LoginUser).RequireRateLimiting("login");
+            app.MapPost("/api/logout", LogoutUser);
+            app.MapPost("/api/refresh-token", RefreshToken).AllowAnonymous();
             
 
             // Test endpoints

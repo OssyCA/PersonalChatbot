@@ -27,7 +27,7 @@ const LoginForm = () => {
     };
 
     try {
-      const response = await authFetch("https://localhost:7289/login", {
+      const response = await authFetch("https://localhost:7289/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,7 +5,7 @@ const LogoutButton = () => {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      await fetch("https://localhost:7289/logout", {
+      await fetch("https://localhost:7289/api/logout", {
         method: "POST",
         credentials: "include",
       });

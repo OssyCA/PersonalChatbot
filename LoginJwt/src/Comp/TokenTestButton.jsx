@@ -61,7 +61,7 @@ const TokenTestButton = () => {
     addMessage("Testing token refresh...");
 
     try {
-      const response = await fetch("https://localhost:7289/refresh-token", {
+      const response = await fetch("https://localhost:7289/api/refresh-token", {
         method: "POST",
         credentials: "include",
       });
