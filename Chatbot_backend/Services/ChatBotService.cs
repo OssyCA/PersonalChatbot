@@ -21,7 +21,13 @@ namespace Chatbot_backend.Services
                 throw new ArgumentNullException(nameof(configuration), "ChatBotApiKey configuration is missing");
 
             // Create endpoint URL
-            endpoint = $"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={apiKey}";
+            //2.5 model
+            endpoint = $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={apiKey}";
+
+            // Free model
+            //endpoint = $"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={apiKey}";
+
+
 
             // Use injected HttpClient or create a new one
             this.httpClient = httpClient ?? new HttpClient();
