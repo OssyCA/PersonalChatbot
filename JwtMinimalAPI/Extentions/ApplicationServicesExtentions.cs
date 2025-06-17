@@ -1,6 +1,9 @@
-﻿using JwtMinimalAPI.Services;
+﻿using JwtMinimalAPI.Endpoints;
+using JwtMinimalAPI.Services;
 using JwtMinimalAPI.Services.ServiceInterfaces;
+using JwtMinimalAPI.StripeConfigs;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 
 namespace JwtMinimalAPI.Extentions
 {
@@ -8,6 +11,7 @@ namespace JwtMinimalAPI.Extentions
     {
         public static IServiceCollection ApplicationServices(this IServiceCollection services)
         {
+            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>(); // Get the configuration
             services.AddOpenApi();
             // Add services to the container.
             services.AddScoped<IAuthService, AuthService>();
@@ -16,6 +20,12 @@ namespace JwtMinimalAPI.Extentions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ChatBotService>();
             services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+
+            // stripe
+            services.Configure<StripeModel>(configuration.GetSection("Stripe"));
+            services.AddScoped<CustomerService>();
+            services.AddScoped<ProductService>();
+            services.AddScoped<Stripe.Checkout.SessionService>();
 
             return services;
         }

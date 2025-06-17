@@ -2,6 +2,7 @@
 
 namespace JwtMinimalAPI.Helpers
 {
+    // FIX USERID IN METHOD NAME§
     public class GetCookieOptionsData
     {
         public static CookieOptions AccessTokenCookie()
@@ -14,7 +15,7 @@ namespace JwtMinimalAPI.Helpers
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             };
         }
-        public static CookieOptions RefreshTokenCookie()
+        public static CookieOptions RefreshTokenAndUserIdCookie()
         {
             return new CookieOptions
             {

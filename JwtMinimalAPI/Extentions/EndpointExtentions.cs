@@ -11,6 +11,10 @@ namespace JwtMinimalAPI.Extentions
             ChatBotEndpoints.GetChatBotEndpoints(app);
             PasswordEndpoints.GetPasswordEndpoints(app);
 
+            // Register Stripe endpoints
+            StripeEndpoints.MapEndpoints(app);
+
+
             return app;
         }
     }
