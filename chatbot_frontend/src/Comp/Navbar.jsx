@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 
 // NEED TO FIX TO UPDATE THE NAVBAR WHEN USER LOGS IN OR LOGS OUT
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in
-    const username = localStorage.getItem("username");
-    setIsLoggedIn(!!username);
-  }, []);
+  // useEffect(() => {
+  //   // Check if user is logged in
+  //   const username = localStorage.getItem("username");
+  //   setIsLoggedIn(!!username);
+  // }, []);
 
   return (
     <header>
@@ -25,56 +25,36 @@ const Navbar = () => {
               Home
             </NavLink>
           </li>
-
-          {!isLoggedIn && (
-            <>
-              <li className="nav-item">
-                <NavLink
-                  to="/login"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Login
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  to="/register"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Register
-                </NavLink>
-              </li>
-            </>
-          )}
-
-          {isLoggedIn && (
-            <>
-              <li className="nav-item">
-                <NavLink
-                  to="/chatbot"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  ChatBot
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  to="/userdashboard"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Dashboard
-                </NavLink>
-              </li>
-            </>
-          )}
+          <li className="nav-item">
+            <NavLink
+              to="/chatbot"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              ChatBot
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink
+              to="/userdashboard"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              Dashboard
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/friendPage"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              Friends
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </header>
