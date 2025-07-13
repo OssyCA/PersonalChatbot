@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Allfriends from "../TempData/tempfriends.json";
 const FriendPage = () => {
+  const checkStatus = () => {};
+
   return (
     <>
       <h1>My Friends</h1>
