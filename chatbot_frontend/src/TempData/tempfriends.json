@@ -1,26 +1,24 @@
-[
-    {
+{
+    "Friends":[
+        {
         "id": 1,
         "name": "John Doe",
         "status": "online"
-    }
-    ,
-    {
+        },
+        {
         "id": 2,
         "name": "Jane Smith",
         "status": "offline"
-    },
-    {
+        },
+        {
         "id": 3,
         "name": "Alice Johnson",
         "status": "away"
-    },
-    {
+        },
+        {
         "id": 4,
         "name": "Bob Brown",
         "status": "busy"
-    }
-
-    
-
-]
+        }
+    ]
+}
