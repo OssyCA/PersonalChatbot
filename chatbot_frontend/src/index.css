@@ -1175,3 +1175,14 @@ nav {
     padding: 0 var(--spacing-lg);
   }
 }
+
+.friendsContainer{
+    padding: var(--spacing-md);
+  
+}
+
+.friendDisplay{
+    padding: var(--spacing-md);
+    border: 2px solid var(--border-color);
+    margin: var(--spacing-xl);
+}
