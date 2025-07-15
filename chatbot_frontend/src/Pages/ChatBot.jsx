@@ -117,12 +117,13 @@ const ChatBot = () => {
   };
 
   const handleBackToDashboard = () => {
-    navigate("/user-dashboard");
+    navigate("/userdashboard");
   };
 
   return (
     <div className="chat-container">
       <div className="chat-header">
+        <button className="btn btn-sm">Chats</button>
         <h1>ChatBot</h1>
         <div className="header-buttons">
           <button onClick={handleBackToDashboard} className="btn btn-sm">

@@ -19,5 +19,7 @@ namespace Chatbot_backend.Models
         public Guid? ForgotPasswordToken { get; set; }
         public DateTime? ForgotPasswordTokenExpireTime { get; set; }
 
+        public ICollection<Friendship>? Friendships { get; set; }
+
     }
 }

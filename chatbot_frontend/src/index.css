@@ -326,6 +326,9 @@ nav {
   font-size: 0.8rem;
   padding: 0.4rem 1rem;
 }
+.btn-sm:hover{
+  opacity: 50%;
+}
 
 .btn:disabled {
   background-color: #9ca3af;
@@ -522,9 +525,11 @@ nav {
   height: 600px;
   display: flex;
   flex-direction: column;
-  background-color: var(--dark-panel-bg);
+  background-color: var(--border-active);
   border-radius: var(--border-radius-lg);
+  border: 2px solid var(--border-color);
   box-shadow: var(--shadow-lg);
+  
   overflow: hidden;
 }
 
