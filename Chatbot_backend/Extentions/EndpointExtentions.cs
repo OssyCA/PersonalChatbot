@@ -10,7 +10,7 @@ namespace Chatbot_backend.Extentions
             UserEndpoints.GetUserEndpoints(app);
             ChatBotEndpoints.GetChatBotEndpoints(app);
             PasswordEndpoints.GetPasswordEndpoints(app);
-
+            FriendEndpoints.MapFriendEndpoints(app);
             // Register Stripe endpoints
             StripeEndpoints.MapEndpoints(app);
 

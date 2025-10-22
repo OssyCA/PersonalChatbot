@@ -4,7 +4,7 @@ namespace Chatbot_backend.Helpers
 {
     public class ValidateObjects
     {
-        public static List<string> ValidateObject<T>(T obj) // T is a generic type
+        public static List<string> ValidateObject<T>(T obj) 
         {
             var context = new ValidationContext(obj, null, null);
             var results = new List<ValidationResult>();

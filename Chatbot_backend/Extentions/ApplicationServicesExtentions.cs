@@ -20,6 +20,7 @@ namespace Chatbot_backend.Extentions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ChatBotService>();
             services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+            services.AddScoped<FriendsService>();
 
             // stripe
             services.Configure<StripeModel>(configuration.GetSection("Stripe"));
@@ -27,6 +28,8 @@ namespace Chatbot_backend.Extentions
             services.AddScoped<ProductService>();
             services.AddScoped<Stripe.Checkout.SessionService>();
 
+            
+            // TEstar
             return services;
         }
     }

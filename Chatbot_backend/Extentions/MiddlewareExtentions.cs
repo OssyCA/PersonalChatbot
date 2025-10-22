@@ -1,5 +1,4 @@
 ﻿using Chatbot_backend.Middlewere;
-using Chatbot_backend.Middlewere;
 using Scalar.AspNetCore;
 
 namespace Chatbot_backend.Extentions
